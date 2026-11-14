@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ Decentralized Cyber Threat Sharing Platform using zk-SNARKs
+# Decentralized Cyber Threat Sharing Platform using zk-SNARKs
 **Privacy-Preserving Threat Intelligence Sharing, IOC Extraction, and Cross-Organization Threat Matching**
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg?logo=python&logoColor=white)](https://python.org)
@@ -14,18 +14,18 @@
 
 ---
 
-## 🎯 Problem Statement & Motivation
+## Problem Statement & Motivation
 Organizations frequently face identical cyberattacks, yet cross-organizational threat intelligence sharing remains broken due to three critical barriers:
 1. **Privacy & Compliance Risk:** Sharing raw threat reports exposes sensitive internal IP addresses, compromised endpoints, and proprietary infrastructure details.
 2. **Centralized Single Points of Failure:** Traditional threat-sharing platforms rely on central repositories vulnerable to breaches, tampering, and single-admin manipulation.
 3. **Lack of Trust & Verification:** Without cryptographic guarantees, organizations cannot verify whether incoming threat alerts are genuine without inspecting confidential underlying payloads.
 
-### 💡 Our Solution
+### Solution Overview
 We engineered a decentralized, zero-trust threat-sharing platform combining **NLP/Regex IOC Extraction**, **Circom zk-SNARKs**, **IPFS**, and **Ethereum Smart Contracts**. Entities upload unstructured threat reports, extract structured Indicators of Compromise (IOCs), generate zero-knowledge proofs confirming threat validity, store encrypted payloads on IPFS, and automatically detect overlapping threats across organizations using cryptographic hash matching.
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## System Architecture & Data Flow
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────┐
