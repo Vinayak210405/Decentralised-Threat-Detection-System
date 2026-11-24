@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          npm ci
+          pip install -r requirements.txt
+      - name: Contract + ZK tests
+        run: npx hardhat test
+      - name: Python tests
+        run: python -m pytest -q
+      - name: End-to-end demo (3 companies, real proofs, local chain)
+        run: python -m dtds.demo --check
