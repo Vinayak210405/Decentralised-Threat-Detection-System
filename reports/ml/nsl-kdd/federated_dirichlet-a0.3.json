@@ -1,0 +1,1362 @@
+{
+  "dataset": "nsl-kdd",
+  "partition": "dirichlet",
+  "alpha": 0.3,
+  "n_clients": 3,
+  "rounds": 30,
+  "local_epochs": 1,
+  "seed": 42,
+  "model": "MLP 128-64 (sklearn MLPClassifier, Adam), FedAvg weighted by sample count",
+  "class_balanced_loss": true,
+  "aggregation": "samples",
+  "clients": {
+    "company_A": "Dirichlet(alpha=0.3) label skew",
+    "company_B": "Dirichlet(alpha=0.3) label skew",
+    "company_C": "Dirichlet(alpha=0.3) label skew"
+  },
+  "client_class_counts": {
+    "company_A": {
+      "DoS": 44294,
+      "Probe": 2746,
+      "Normal": 1833,
+      "R2L": 7
+    },
+    "company_B": {
+      "Normal": 53602,
+      "Probe": 6305,
+      "DoS": 853,
+      "R2L": 683,
+      "U2R": 1
+    },
+    "company_C": {
+      "Normal": 11908,
+      "Probe": 2605,
+      "DoS": 780,
+      "R2L": 305,
+      "U2R": 51
+    }
+  },
+  "results": {
+    "federated": {
+      "accuracy": 0.7819819020581973,
+      "macro_f1": 0.5524365687017337,
+      "weighted_f1": 0.7534703758240381,
+      "detection_rate": 0.6703031247564872,
+      "false_alarm_rate": 0.03562969828030069,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6888055310385407,
+          "recall": 0.9643703017196993,
+          "f1": 0.8036212296734887,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9669100512661177,
+          "recall": 0.8343163538873994,
+          "f1": 0.8957328919910772,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.7811579980372915,
+          "recall": 0.6575795125981,
+          "f1": 0.7140614487553263,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.9508547008547008,
+          "recall": 0.15424610051993068,
+          "f1": 0.2654339397554429,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.6,
+          "recall": 0.04477611940298507,
+          "f1": 0.08333333333333333,
+          "support": 67
+        }
+      },
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8028184520532864,
+      "detection_rate_novel_attacks": 0.34933333333333333,
+      "train_seconds": 20.997866256000066
+    },
+    "centralised": {
+      "accuracy": 0.7738200851667849,
+      "macro_f1": 0.6354703601430365,
+      "weighted_f1": 0.7478751929574751,
+      "detection_rate": 0.6501207823579833,
+      "false_alarm_rate": 0.03614457831325301,
+      "per_class": {
+        "Normal": {
+          "precision": 0.675812274368231,
+          "recall": 0.963855421686747,
+          "f1": 0.7945333389924027,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.963254593175853,
+          "recall": 0.7871313672922252,
+          "f1": 0.8663322514015934,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8324480927088364,
+          "recall": 0.7121024370095002,
+          "f1": 0.767586821015138,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.9684873949579832,
+          "recall": 0.15979202772963605,
+          "f1": 0.27432311811960725,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.5490196078431373,
+          "recall": 0.417910447761194,
+          "f1": 0.4745762711864407,
+          "support": 67
+        }
+      },
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8036992183199383,
+      "detection_rate_novel_attacks": 0.27813333333333334,
+      "train_seconds": 20.70133330500005
+    },
+    "local_company_A": {
+      "accuracy": 0.7574520936834634,
+      "macro_f1": 0.49533567047662,
+      "weighted_f1": 0.7210144514714774,
+      "detection_rate": 0.6759915841969921,
+      "false_alarm_rate": 0.07764390896921017,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6829584445291651,
+          "recall": 0.9223560910307899,
+          "f1": 0.7848067992639972,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9644312127859606,
+          "recall": 0.8250670241286864,
+          "f1": 0.8893223522612339,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.6376707404744788,
+          "recall": 0.7327550598926064,
+          "f1": 0.6819142802229483,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.7169811320754716,
+          "recall": 0.0658578856152513,
+          "f1": 0.12063492063492064,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 67
+        }
+      },
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8020477815699659,
+      "detection_rate_novel_attacks": 0.37066666666666664,
+      "train_seconds": 11.735860269
+    },
+    "local_company_B": {
+      "accuracy": 0.788014549325763,
+      "macro_f1": 0.5544419730585198,
+      "weighted_f1": 0.7652175838740839,
+      "detection_rate": 0.6720174549988311,
+      "false_alarm_rate": 0.031201729996910718,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6909010795329368,
+          "recall": 0.9687982700030893,
+          "f1": 0.8065843621399177,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9749285940971121,
+          "recall": 0.8235924932975871,
+          "f1": 0.8928934747856416,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8050125313283208,
+          "recall": 0.6633622470053697,
+          "f1": 0.7273550724637681,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.9634920634920635,
+          "recall": 0.21039861351819758,
+          "f1": 0.34537695590327167,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 67
+        }
+      },
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8145987008697567,
+      "detection_rate_novel_attacks": 0.32666666666666666,
+      "train_seconds": 11.852403406999997
+    },
+    "local_company_C": {
+      "accuracy": 0.7792317246273953,
+      "macro_f1": 0.6097748606835702,
+      "weighted_f1": 0.7520732547375722,
+      "detection_rate": 0.654484532065768,
+      "false_alarm_rate": 0.026567809700339822,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6807085763663858,
+          "recall": 0.9734321902996602,
+          "f1": 0.8011695906432749,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.97250244061178,
+          "recall": 0.8012064343163539,
+          "f1": 0.878582978097898,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8665636269963937,
+          "recall": 0.6947542337876911,
+          "f1": 0.771205868867492,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.967741935483871,
+          "recall": 0.14558058925476602,
+          "f1": 0.25308827960228986,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.25735294117647056,
+          "recall": 0.5223880597014925,
+          "f1": 0.3448275862068966,
+          "support": 67
+        }
+      },
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8079929538698668,
+      "detection_rate_novel_attacks": 0.2826666666666667,
+      "train_seconds": 6.065851572999918
+    }
+  },
+  "unseen_category_recall": {
+    "company_A": {
+      "unseen_categories": [
+        "U2R"
+      ],
+      "local_recall": 0.0,
+      "federated_recall": 0.04477611940298507
+    }
+  },
+  "curves": {
+    "federated": [
+      {
+        "round": 1,
+        "accuracy": 0.7702714691270405,
+        "macro_f1": 0.5284496433147876,
+        "detection_rate": 0.6486402244214136,
+        "false_alarm_rate": 0.03243744207599629
+      },
+      {
+        "round": 2,
+        "accuracy": 0.7594925479063165,
+        "macro_f1": 0.5328722280557576,
+        "detection_rate": 0.6540949115561443,
+        "false_alarm_rate": 0.07228915662650602
+      },
+      {
+        "round": 3,
+        "accuracy": 0.79555535841022,
+        "macro_f1": 0.6019358315895404,
+        "detection_rate": 0.6879918958933998,
+        "false_alarm_rate": 0.03604160230666255
+      },
+      {
+        "round": 4,
+        "accuracy": 0.7780784244144784,
+        "macro_f1": 0.568574184918052,
+        "detection_rate": 0.6855762487337334,
+        "false_alarm_rate": 0.0717742765935537
+      },
+      {
+        "round": 5,
+        "accuracy": 0.791208303761533,
+        "macro_f1": 0.5683192655709128,
+        "detection_rate": 0.6708485934699603,
+        "false_alarm_rate": 0.02842137781896818
+      },
+      {
+        "round": 6,
+        "accuracy": 0.7963094393186657,
+        "macro_f1": 0.6014832440949913,
+        "detection_rate": 0.7349022052520845,
+        "false_alarm_rate": 0.0642570281124498
+      },
+      {
+        "round": 7,
+        "accuracy": 0.7866838183108588,
+        "macro_f1": 0.5558318674558025,
+        "detection_rate": 0.6860437933452816,
+        "false_alarm_rate": 0.02955411389146329
+      },
+      {
+        "round": 8,
+        "accuracy": 0.7802519517388219,
+        "macro_f1": 0.5598454201586593,
+        "detection_rate": 0.6817579677394218,
+        "false_alarm_rate": 0.06662547626403048
+      },
+      {
+        "round": 9,
+        "accuracy": 0.7957327892122072,
+        "macro_f1": 0.5883995459371514,
+        "detection_rate": 0.7394218031637185,
+        "false_alarm_rate": 0.0720832046133251
+      },
+      {
+        "round": 10,
+        "accuracy": 0.7826472675656494,
+        "macro_f1": 0.5609781568662606,
+        "detection_rate": 0.7059144393360867,
+        "false_alarm_rate": 0.06899392441561117
+      },
+      {
+        "round": 11,
+        "accuracy": 0.8084190915542938,
+        "macro_f1": 0.5979615067450812,
+        "detection_rate": 0.7187719161536663,
+        "false_alarm_rate": 0.03027494593759654
+      },
+      {
+        "round": 12,
+        "accuracy": 0.7928938963804116,
+        "macro_f1": 0.5625807591010865,
+        "detection_rate": 0.686823034364529,
+        "false_alarm_rate": 0.02986304191123468
+      },
+      {
+        "round": 13,
+        "accuracy": 0.7928495386799148,
+        "macro_f1": 0.6047023812185545,
+        "detection_rate": 0.7390321826540949,
+        "false_alarm_rate": 0.0749665327978581
+      },
+      {
+        "round": 14,
+        "accuracy": 0.8107700496806246,
+        "macro_f1": 0.5997382060963432,
+        "detection_rate": 0.7076287695784306,
+        "false_alarm_rate": 0.03027494593759654
+      },
+      {
+        "round": 15,
+        "accuracy": 0.7939141234918382,
+        "macro_f1": 0.5638593029331029,
+        "detection_rate": 0.7077066936803553,
+        "false_alarm_rate": 0.03243744207599629
+      },
+      {
+        "round": 16,
+        "accuracy": 0.8094836763662172,
+        "macro_f1": 0.5951481332634051,
+        "detection_rate": 0.7363827631886543,
+        "false_alarm_rate": 0.033364226135310475
+      },
+      {
+        "round": 17,
+        "accuracy": 0.7913413768630234,
+        "macro_f1": 0.5619183497372459,
+        "detection_rate": 0.6734980129354009,
+        "false_alarm_rate": 0.029657089898053754
+      },
+      {
+        "round": 18,
+        "accuracy": 0.7951561391057488,
+        "macro_f1": 0.5914961855253711,
+        "detection_rate": 0.7233694381672251,
+        "false_alarm_rate": 0.05972608382246936
+      },
+      {
+        "round": 19,
+        "accuracy": 0.7805624556422995,
+        "macro_f1": 0.5566932444664723,
+        "detection_rate": 0.6710823657757344,
+        "false_alarm_rate": 0.05262073936772732
+      },
+      {
+        "round": 20,
+        "accuracy": 0.7893896380411639,
+        "macro_f1": 0.5604835752467997,
+        "detection_rate": 0.6754461154835191,
+        "false_alarm_rate": 0.037895170425290906
+      },
+      {
+        "round": 21,
+        "accuracy": 0.780917317246274,
+        "macro_f1": 0.5360651581287141,
+        "detection_rate": 0.6671082365775735,
+        "false_alarm_rate": 0.02842137781896818
+      },
+      {
+        "round": 22,
+        "accuracy": 0.7995031937544358,
+        "macro_f1": 0.6201685841311867,
+        "detection_rate": 0.7274994155692356,
+        "false_alarm_rate": 0.053238595407270106
+      },
+      {
+        "round": 23,
+        "accuracy": 0.8053140525195174,
+        "macro_f1": 0.6154705368335851,
+        "detection_rate": 0.7000701316917323,
+        "false_alarm_rate": 0.03099577798372979
+      },
+      {
+        "round": 24,
+        "accuracy": 0.8044268985095813,
+        "macro_f1": 0.6221691619173887,
+        "detection_rate": 0.6994467388763345,
+        "false_alarm_rate": 0.03027494593759654
+      },
+      {
+        "round": 25,
+        "accuracy": 0.8048704755145494,
+        "macro_f1": 0.6185372651497005,
+        "detection_rate": 0.6986674978570871,
+        "false_alarm_rate": 0.02914220986510143
+      },
+      {
+        "round": 26,
+        "accuracy": 0.8034953867991483,
+        "macro_f1": 0.5998079039380474,
+        "detection_rate": 0.6939920517416037,
+        "false_alarm_rate": 0.029245185871691896
+      },
+      {
+        "round": 27,
+        "accuracy": 0.7917849538679915,
+        "macro_f1": 0.6004431900373214,
+        "detection_rate": 0.6780176108470349,
+        "false_alarm_rate": 0.02976006590464422
+      },
+      {
+        "round": 28,
+        "accuracy": 0.8003903477643719,
+        "macro_f1": 0.6088839496974082,
+        "detection_rate": 0.6889269851164965,
+        "false_alarm_rate": 0.028833281845330037
+      },
+      {
+        "round": 29,
+        "accuracy": 0.7899219304471257,
+        "macro_f1": 0.5767165518102236,
+        "detection_rate": 0.6741214057507987,
+        "false_alarm_rate": 0.029451137884872823
+      },
+      {
+        "round": 30,
+        "accuracy": 0.7819819020581973,
+        "macro_f1": 0.5524365687017337,
+        "detection_rate": 0.6703031247564872,
+        "false_alarm_rate": 0.03562969828030069
+      }
+    ],
+    "centralised": [
+      {
+        "round": 1,
+        "accuracy": 0.8006121362668559,
+        "macro_f1": 0.6773924418939881,
+        "detection_rate": 0.7077066936803553,
+        "false_alarm_rate": 0.03974873854391927
+      },
+      {
+        "round": 2,
+        "accuracy": 0.7866838183108588,
+        "macro_f1": 0.5858882344957556,
+        "detection_rate": 0.726798098651913,
+        "false_alarm_rate": 0.035526722273710225
+      },
+      {
+        "round": 3,
+        "accuracy": 0.810459545777147,
+        "macro_f1": 0.6982619396646699,
+        "detection_rate": 0.7360710667809554,
+        "false_alarm_rate": 0.03367315415508187
+      },
+      {
+        "round": 4,
+        "accuracy": 0.7989265436479773,
+        "macro_f1": 0.609791139225465,
+        "detection_rate": 0.7330320268058911,
+        "false_alarm_rate": 0.03346720214190094
+      },
+      {
+        "round": 5,
+        "accuracy": 0.7871717530163236,
+        "macro_f1": 0.5989122060286808,
+        "detection_rate": 0.7057585911322372,
+        "false_alarm_rate": 0.03161363402327258
+      },
+      {
+        "round": 6,
+        "accuracy": 0.7755943931866572,
+        "macro_f1": 0.5732136582728855,
+        "detection_rate": 0.6767708252162394,
+        "false_alarm_rate": 0.03099577798372979
+      },
+      {
+        "round": 7,
+        "accuracy": 0.7822480482611781,
+        "macro_f1": 0.6470054781925227,
+        "detection_rate": 0.6631341073794125,
+        "false_alarm_rate": 0.030789825970548863
+      },
+      {
+        "round": 8,
+        "accuracy": 0.7810947480482612,
+        "macro_f1": 0.6292820950988857,
+        "detection_rate": 0.6673420088833476,
+        "false_alarm_rate": 0.03233446606940583
+      },
+      {
+        "round": 9,
+        "accuracy": 0.7825585521646558,
+        "macro_f1": 0.5950209958211208,
+        "detection_rate": 0.6766929011143147,
+        "false_alarm_rate": 0.031201729996910718
+      },
+      {
+        "round": 10,
+        "accuracy": 0.7850869410929737,
+        "macro_f1": 0.6474926010535759,
+        "detection_rate": 0.7048235019091404,
+        "false_alarm_rate": 0.07702605292966738
+      },
+      {
+        "round": 11,
+        "accuracy": 0.7826029098651526,
+        "macro_f1": 0.5769297127844013,
+        "detection_rate": 0.6954726096781735,
+        "false_alarm_rate": 0.03274637009576769
+      },
+      {
+        "round": 12,
+        "accuracy": 0.7988821859474805,
+        "macro_f1": 0.6595486713980263,
+        "detection_rate": 0.6985116496532378,
+        "false_alarm_rate": 0.03151065801668211
+      },
+      {
+        "round": 13,
+        "accuracy": 0.7759936124911284,
+        "macro_f1": 0.6145900808862261,
+        "detection_rate": 0.654172835658069,
+        "false_alarm_rate": 0.031098753990320256
+      },
+      {
+        "round": 14,
+        "accuracy": 0.7771469127040455,
+        "macro_f1": 0.6008191564860458,
+        "detection_rate": 0.6902516948492169,
+        "false_alarm_rate": 0.056636803624755434
+      },
+      {
+        "round": 15,
+        "accuracy": 0.7629080908445706,
+        "macro_f1": 0.6251893858814788,
+        "detection_rate": 0.6438868542040053,
+        "false_alarm_rate": 0.0489136031304706
+      },
+      {
+        "round": 16,
+        "accuracy": 0.7760379701916252,
+        "macro_f1": 0.6104947802591616,
+        "detection_rate": 0.6591599781812515,
+        "false_alarm_rate": 0.031201729996910718
+      },
+      {
+        "round": 17,
+        "accuracy": 0.7805624556422995,
+        "macro_f1": 0.639937509826377,
+        "detection_rate": 0.6696797319410894,
+        "false_alarm_rate": 0.03254041808258676
+      },
+      {
+        "round": 18,
+        "accuracy": 0.7829134137686302,
+        "macro_f1": 0.6197035644381158,
+        "detection_rate": 0.6720953791007559,
+        "false_alarm_rate": 0.032025538049634435
+      },
+      {
+        "round": 19,
+        "accuracy": 0.774041873669269,
+        "macro_f1": 0.6209843952113097,
+        "detection_rate": 0.6488739967271877,
+        "false_alarm_rate": 0.031201729996910718
+      },
+      {
+        "round": 20,
+        "accuracy": 0.7938254080908446,
+        "macro_f1": 0.6369379786024255,
+        "detection_rate": 0.7043559572975922,
+        "false_alarm_rate": 0.03408505818144372
+      },
+      {
+        "round": 21,
+        "accuracy": 0.7847320794889993,
+        "macro_f1": 0.6560307425485143,
+        "detection_rate": 0.6825372087586691,
+        "false_alarm_rate": 0.034393986201215115
+      },
+      {
+        "round": 22,
+        "accuracy": 0.7775461320085166,
+        "macro_f1": 0.632504502296446,
+        "detection_rate": 0.6578352684485311,
+        "false_alarm_rate": 0.03254041808258676
+      },
+      {
+        "round": 23,
+        "accuracy": 0.7697835344215755,
+        "macro_f1": 0.6155380068733599,
+        "detection_rate": 0.6466141977713706,
+        "false_alarm_rate": 0.03367315415508187
+      },
+      {
+        "round": 24,
+        "accuracy": 0.781139105748758,
+        "macro_f1": 0.6279116719014108,
+        "detection_rate": 0.6670303124756487,
+        "false_alarm_rate": 0.03099577798372979
+      },
+      {
+        "round": 25,
+        "accuracy": 0.7735539389638041,
+        "macro_f1": 0.6152675400902581,
+        "detection_rate": 0.6650042858256059,
+        "false_alarm_rate": 0.033364226135310475
+      },
+      {
+        "round": 26,
+        "accuracy": 0.7594481902058198,
+        "macro_f1": 0.5956465287255323,
+        "detection_rate": 0.675757811891218,
+        "false_alarm_rate": 0.07970342910101946
+      },
+      {
+        "round": 27,
+        "accuracy": 0.7725337118523776,
+        "macro_f1": 0.6338209550189209,
+        "detection_rate": 0.6667965401698746,
+        "false_alarm_rate": 0.038101122438471836
+      },
+      {
+        "round": 28,
+        "accuracy": 0.775195173882186,
+        "macro_f1": 0.6542470086718705,
+        "detection_rate": 0.6507441751733811,
+        "false_alarm_rate": 0.03305529811553908
+      },
+      {
+        "round": 29,
+        "accuracy": 0.7754613200851668,
+        "macro_f1": 0.6312207975370605,
+        "detection_rate": 0.6597054468947245,
+        "false_alarm_rate": 0.03367315415508187
+      },
+      {
+        "round": 30,
+        "accuracy": 0.7738200851667849,
+        "macro_f1": 0.6354703601430365,
+        "detection_rate": 0.6501207823579833,
+        "false_alarm_rate": 0.03614457831325301
+      }
+    ],
+    "company_A": [
+      {
+        "round": 1,
+        "accuracy": 0.72986160397445,
+        "macro_f1": 0.47440118294774225,
+        "detection_rate": 0.6096781734590508,
+        "false_alarm_rate": 0.06940582844197302
+      },
+      {
+        "round": 2,
+        "accuracy": 0.7499112845990064,
+        "macro_f1": 0.48477801529887943,
+        "detection_rate": 0.7321748616847191,
+        "false_alarm_rate": 0.08145402121305735
+      },
+      {
+        "round": 3,
+        "accuracy": 0.7424148332150461,
+        "macro_f1": 0.4907060844852861,
+        "detection_rate": 0.6590820540793267,
+        "false_alarm_rate": 0.0660076202244877
+      },
+      {
+        "round": 4,
+        "accuracy": 0.7461852377572746,
+        "macro_f1": 0.4954761663375436,
+        "detection_rate": 0.6702252006545625,
+        "false_alarm_rate": 0.06446298012563073
+      },
+      {
+        "round": 5,
+        "accuracy": 0.7633960255500355,
+        "macro_f1": 0.5069940484293376,
+        "detection_rate": 0.6665627678641004,
+        "false_alarm_rate": 0.035938626300072087
+      },
+      {
+        "round": 6,
+        "accuracy": 0.7758161816891412,
+        "macro_f1": 0.5161786767217142,
+        "detection_rate": 0.6646146653159822,
+        "false_alarm_rate": 0.028730305838739572
+      },
+      {
+        "round": 7,
+        "accuracy": 0.7729772888573456,
+        "macro_f1": 0.5140082253179339,
+        "detection_rate": 0.671783682693057,
+        "false_alarm_rate": 0.0382040984450623
+      },
+      {
+        "round": 8,
+        "accuracy": 0.7647711142654364,
+        "macro_f1": 0.5143279589797529,
+        "detection_rate": 0.6793423205797553,
+        "false_alarm_rate": 0.0685820203892493
+      },
+      {
+        "round": 9,
+        "accuracy": 0.7474272533711852,
+        "macro_f1": 0.48589109275055264,
+        "detection_rate": 0.6543286838619184,
+        "false_alarm_rate": 0.07280403665945835
+      },
+      {
+        "round": 10,
+        "accuracy": 0.7511976579134138,
+        "macro_f1": 0.49420486442042116,
+        "detection_rate": 0.6759136600950674,
+        "false_alarm_rate": 0.07671712490989599
+      },
+      {
+        "round": 11,
+        "accuracy": 0.75847232079489,
+        "macro_f1": 0.5104519339099061,
+        "detection_rate": 0.6754461154835191,
+        "false_alarm_rate": 0.0732159406858202
+      },
+      {
+        "round": 12,
+        "accuracy": 0.7602022711142654,
+        "macro_f1": 0.49918626364906366,
+        "detection_rate": 0.6530818982311228,
+        "false_alarm_rate": 0.051796931315003604
+      },
+      {
+        "round": 13,
+        "accuracy": 0.7553672817601136,
+        "macro_f1": 0.4998920062286545,
+        "detection_rate": 0.6722512273046053,
+        "false_alarm_rate": 0.0764081968901246
+      },
+      {
+        "round": 14,
+        "accuracy": 0.7586053938963804,
+        "macro_f1": 0.5017512471462765,
+        "detection_rate": 0.6730304683238526,
+        "false_alarm_rate": 0.07053856451446813
+      },
+      {
+        "round": 15,
+        "accuracy": 0.7561213626685592,
+        "macro_f1": 0.4994731925135878,
+        "detection_rate": 0.6725629237123042,
+        "false_alarm_rate": 0.07465760477808671
+      },
+      {
+        "round": 16,
+        "accuracy": 0.7693399574166075,
+        "macro_f1": 0.5080767325314212,
+        "detection_rate": 0.6484064521156394,
+        "false_alarm_rate": 0.029451137884872823
+      },
+      {
+        "round": 17,
+        "accuracy": 0.749778211497516,
+        "macro_f1": 0.4901765515179711,
+        "detection_rate": 0.6644588171121328,
+        "false_alarm_rate": 0.07754093296261971
+      },
+      {
+        "round": 18,
+        "accuracy": 0.7553229240596168,
+        "macro_f1": 0.4914459008665209,
+        "detection_rate": 0.6651601340294553,
+        "false_alarm_rate": 0.0764081968901246
+      },
+      {
+        "round": 19,
+        "accuracy": 0.754125266146203,
+        "macro_f1": 0.49796031843850397,
+        "detection_rate": 0.6689004909218421,
+        "false_alarm_rate": 0.0749665327978581
+      },
+      {
+        "round": 20,
+        "accuracy": 0.7547019162526615,
+        "macro_f1": 0.4933733369958194,
+        "detection_rate": 0.6804332580067015,
+        "false_alarm_rate": 0.08227782926578107
+      },
+      {
+        "round": 21,
+        "accuracy": 0.7593594748048261,
+        "macro_f1": 0.499559743299167,
+        "detection_rate": 0.6787968518662822,
+        "false_alarm_rate": 0.07887962104829575
+      },
+      {
+        "round": 22,
+        "accuracy": 0.7536373314407381,
+        "macro_f1": 0.49754498466232466,
+        "detection_rate": 0.6895503779318943,
+        "false_alarm_rate": 0.0845433014107713
+      },
+      {
+        "round": 23,
+        "accuracy": 0.7535929737402413,
+        "macro_f1": 0.4977419139533093,
+        "detection_rate": 0.6694459596353152,
+        "false_alarm_rate": 0.07733498094943878
+      },
+      {
+        "round": 24,
+        "accuracy": 0.7501774308019872,
+        "macro_f1": 0.49409675219341914,
+        "detection_rate": 0.6523805813138004,
+        "false_alarm_rate": 0.07373082071877253
+      },
+      {
+        "round": 25,
+        "accuracy": 0.7425479063165366,
+        "macro_f1": 0.4697836788149588,
+        "detection_rate": 0.6290033507363828,
+        "false_alarm_rate": 0.0752754608176295
+      },
+      {
+        "round": 26,
+        "accuracy": 0.7418381831085876,
+        "macro_f1": 0.49344314579715354,
+        "detection_rate": 0.6892386815241954,
+        "false_alarm_rate": 0.0781587890021625
+      },
+      {
+        "round": 27,
+        "accuracy": 0.7629524485450674,
+        "macro_f1": 0.49326583109902244,
+        "detection_rate": 0.7412919816099119,
+        "false_alarm_rate": 0.0778498609823911
+      },
+      {
+        "round": 28,
+        "accuracy": 0.7555447125621008,
+        "macro_f1": 0.4885530862443884,
+        "detection_rate": 0.6676537052910465,
+        "false_alarm_rate": 0.07414272474513438
+      },
+      {
+        "round": 29,
+        "accuracy": 0.7575851667849539,
+        "macro_f1": 0.49453094521919355,
+        "detection_rate": 0.6649263617236811,
+        "false_alarm_rate": 0.07692307692307693
+      },
+      {
+        "round": 30,
+        "accuracy": 0.7574520936834634,
+        "macro_f1": 0.49533567047662,
+        "detection_rate": 0.6759915841969921,
+        "false_alarm_rate": 0.07764390896921017
+      }
+    ],
+    "company_B": [
+      {
+        "round": 1,
+        "accuracy": 0.8059350603264727,
+        "macro_f1": 0.6056636777786337,
+        "detection_rate": 0.7412140575079872,
+        "false_alarm_rate": 0.0752754608176295
+      },
+      {
+        "round": 2,
+        "accuracy": 0.8047374024130589,
+        "macro_f1": 0.5947180132812411,
+        "detection_rate": 0.7637341229642328,
+        "false_alarm_rate": 0.07249510863968696
+      },
+      {
+        "round": 3,
+        "accuracy": 0.7989265436479773,
+        "macro_f1": 0.605779050785275,
+        "detection_rate": 0.7271097950596119,
+        "false_alarm_rate": 0.04098445062300484
+      },
+      {
+        "round": 4,
+        "accuracy": 0.7887242725337118,
+        "macro_f1": 0.5814865330887912,
+        "detection_rate": 0.7369282319021273,
+        "false_alarm_rate": 0.07476058078467716
+      },
+      {
+        "round": 5,
+        "accuracy": 0.7920954577714692,
+        "macro_f1": 0.5814351647150497,
+        "detection_rate": 0.6784851554585833,
+        "false_alarm_rate": 0.0321285140562249
+      },
+      {
+        "round": 6,
+        "accuracy": 0.7850425833924769,
+        "macro_f1": 0.5538439249437473,
+        "detection_rate": 0.6628224109717136,
+        "false_alarm_rate": 0.02955411389146329
+      },
+      {
+        "round": 7,
+        "accuracy": 0.784111071682044,
+        "macro_f1": 0.5501135944762322,
+        "detection_rate": 0.660718460219746,
+        "false_alarm_rate": 0.02934816187828236
+      },
+      {
+        "round": 8,
+        "accuracy": 0.7937366926898509,
+        "macro_f1": 0.5678524821591138,
+        "detection_rate": 0.709498948024624,
+        "false_alarm_rate": 0.030068993924415612
+      },
+      {
+        "round": 9,
+        "accuracy": 0.7857523066004258,
+        "macro_f1": 0.568351996612207,
+        "detection_rate": 0.6901737707472921,
+        "false_alarm_rate": 0.06456595613222119
+      },
+      {
+        "round": 10,
+        "accuracy": 0.7791873669268985,
+        "macro_f1": 0.550780983692812,
+        "detection_rate": 0.6518351126003272,
+        "false_alarm_rate": 0.02914220986510143
+      },
+      {
+        "round": 11,
+        "accuracy": 0.7737757274662882,
+        "macro_f1": 0.5442086980435169,
+        "detection_rate": 0.6407698901270162,
+        "false_alarm_rate": 0.029657089898053754
+      },
+      {
+        "round": 12,
+        "accuracy": 0.7657469836763662,
+        "macro_f1": 0.5365504707592746,
+        "detection_rate": 0.6223798020727811,
+        "false_alarm_rate": 0.027803521779425393
+      },
+      {
+        "round": 13,
+        "accuracy": 0.7897444996451384,
+        "macro_f1": 0.5771087085010247,
+        "detection_rate": 0.666640691966025,
+        "false_alarm_rate": 0.029451137884872823
+      },
+      {
+        "round": 14,
+        "accuracy": 0.7835344215755855,
+        "macro_f1": 0.5712180074362061,
+        "detection_rate": 0.6558092417984883,
+        "false_alarm_rate": 0.02903923385851097
+      },
+      {
+        "round": 15,
+        "accuracy": 0.7883694109297374,
+        "macro_f1": 0.5655327192447693,
+        "detection_rate": 0.6672640847814229,
+        "false_alarm_rate": 0.030068993924415612
+      },
+      {
+        "round": 16,
+        "accuracy": 0.7878371185237757,
+        "macro_f1": 0.5660285943526329,
+        "detection_rate": 0.666095223252552,
+        "false_alarm_rate": 0.02976006590464422
+      },
+      {
+        "round": 17,
+        "accuracy": 0.7835787792760823,
+        "macro_f1": 0.5587126473700825,
+        "detection_rate": 0.6692901114314658,
+        "false_alarm_rate": 0.039233858510966946
+      },
+      {
+        "round": 18,
+        "accuracy": 0.7735982966643009,
+        "macro_f1": 0.5359212808212929,
+        "detection_rate": 0.6384321670692745,
+        "false_alarm_rate": 0.028009473792606324
+      },
+      {
+        "round": 19,
+        "accuracy": 0.7774574166075231,
+        "macro_f1": 0.5560592647665195,
+        "detection_rate": 0.6483285280137147,
+        "false_alarm_rate": 0.030583873957367932
+      },
+      {
+        "round": 20,
+        "accuracy": 0.7760823278921221,
+        "macro_f1": 0.5352807668997228,
+        "detection_rate": 0.6484064521156394,
+        "false_alarm_rate": 0.030686849963958398
+      },
+      {
+        "round": 21,
+        "accuracy": 0.7799414478353442,
+        "macro_f1": 0.5525271576816514,
+        "detection_rate": 0.6517571884984026,
+        "false_alarm_rate": 0.030583873957367932
+      },
+      {
+        "round": 22,
+        "accuracy": 0.7772799858055358,
+        "macro_f1": 0.5394027020572287,
+        "detection_rate": 0.6466921218732954,
+        "false_alarm_rate": 0.030686849963958398
+      },
+      {
+        "round": 23,
+        "accuracy": 0.7916075230660042,
+        "macro_f1": 0.5613675598209119,
+        "detection_rate": 0.673731785241175,
+        "false_alarm_rate": 0.030686849963958398
+      },
+      {
+        "round": 24,
+        "accuracy": 0.7848651525904897,
+        "macro_f1": 0.5517659406641199,
+        "detection_rate": 0.6586145094677783,
+        "false_alarm_rate": 0.029657089898053754
+      },
+      {
+        "round": 25,
+        "accuracy": 0.7825585521646558,
+        "macro_f1": 0.5425601590102183,
+        "detection_rate": 0.6561209382061872,
+        "false_alarm_rate": 0.02986304191123468
+      },
+      {
+        "round": 26,
+        "accuracy": 0.7825141944641589,
+        "macro_f1": 0.5432498821365981,
+        "detection_rate": 0.6568222551235097,
+        "false_alarm_rate": 0.03048089795077747
+      },
+      {
+        "round": 27,
+        "accuracy": 0.7826029098651526,
+        "macro_f1": 0.5420643123630764,
+        "detection_rate": 0.6565884828177355,
+        "false_alarm_rate": 0.030686849963958398
+      },
+      {
+        "round": 28,
+        "accuracy": 0.7834900638750887,
+        "macro_f1": 0.5421949285650074,
+        "detection_rate": 0.6579911166523806,
+        "false_alarm_rate": 0.02976006590464422
+      },
+      {
+        "round": 29,
+        "accuracy": 0.7822924059616749,
+        "macro_f1": 0.5397528536162731,
+        "detection_rate": 0.6559650900023377,
+        "false_alarm_rate": 0.029451137884872823
+      },
+      {
+        "round": 30,
+        "accuracy": 0.788014549325763,
+        "macro_f1": 0.5544419730585198,
+        "detection_rate": 0.6720174549988311,
+        "false_alarm_rate": 0.031201729996910718
+      }
+    ],
+    "company_C": [
+      {
+        "round": 1,
+        "accuracy": 0.7979506742370476,
+        "macro_f1": 0.6785245031572946,
+        "detection_rate": 0.7309280760539235,
+        "false_alarm_rate": 0.053135619400679644
+      },
+      {
+        "round": 2,
+        "accuracy": 0.7915631653655074,
+        "macro_f1": 0.6143697955019685,
+        "detection_rate": 0.7498636328216317,
+        "false_alarm_rate": 0.048501699104108745
+      },
+      {
+        "round": 3,
+        "accuracy": 0.7918736692689851,
+        "macro_f1": 0.6193852562506896,
+        "detection_rate": 0.7244603755941713,
+        "false_alarm_rate": 0.04294099474822367
+      },
+      {
+        "round": 4,
+        "accuracy": 0.803584102200142,
+        "macro_f1": 0.6288979912096414,
+        "detection_rate": 0.745811579521546,
+        "false_alarm_rate": 0.041602306662547626
+      },
+      {
+        "round": 5,
+        "accuracy": 0.8069109297374024,
+        "macro_f1": 0.6315535742760465,
+        "detection_rate": 0.74752590976389,
+        "false_alarm_rate": 0.040160642570281124
+      },
+      {
+        "round": 6,
+        "accuracy": 0.7959102200141944,
+        "macro_f1": 0.6295069611734094,
+        "detection_rate": 0.7061482116418608,
+        "false_alarm_rate": 0.03738029039233858
+      },
+      {
+        "round": 7,
+        "accuracy": 0.7959545777146912,
+        "macro_f1": 0.6215757969547987,
+        "detection_rate": 0.7107457336554196,
+        "false_alarm_rate": 0.03727731438574812
+      },
+      {
+        "round": 8,
+        "accuracy": 0.805180979418027,
+        "macro_f1": 0.667036633284602,
+        "detection_rate": 0.7138626977324086,
+        "false_alarm_rate": 0.03562969828030069
+      },
+      {
+        "round": 9,
+        "accuracy": 0.8034066713981547,
+        "macro_f1": 0.6074404667281865,
+        "detection_rate": 0.7401231200810411,
+        "false_alarm_rate": 0.03429101019462465
+      },
+      {
+        "round": 10,
+        "accuracy": 0.7976401703335699,
+        "macro_f1": 0.600438625401452,
+        "detection_rate": 0.7240707550845477,
+        "false_alarm_rate": 0.03243744207599629
+      },
+      {
+        "round": 11,
+        "accuracy": 0.8028300212916962,
+        "macro_f1": 0.6053818385651167,
+        "detection_rate": 0.7366944595963532,
+        "false_alarm_rate": 0.0321285140562249
+      },
+      {
+        "round": 12,
+        "accuracy": 0.7885468417317246,
+        "macro_f1": 0.6101977911117278,
+        "detection_rate": 0.683394373879841,
+        "false_alarm_rate": 0.03048089795077747
+      },
+      {
+        "round": 13,
+        "accuracy": 0.7897888573456352,
+        "macro_f1": 0.6440149660760228,
+        "detection_rate": 0.6779396867451103,
+        "false_alarm_rate": 0.02986304191123468
+      },
+      {
+        "round": 14,
+        "accuracy": 0.794889992902768,
+        "macro_f1": 0.5983333743661366,
+        "detection_rate": 0.7144860905478064,
+        "false_alarm_rate": 0.030377921944187005
+      },
+      {
+        "round": 15,
+        "accuracy": 0.7952448545067423,
+        "macro_f1": 0.6145574862696026,
+        "detection_rate": 0.7020182342398504,
+        "false_alarm_rate": 0.03099577798372979
+      },
+      {
+        "round": 16,
+        "accuracy": 0.7940915542938254,
+        "macro_f1": 0.5974011199813243,
+        "detection_rate": 0.7144860905478064,
+        "false_alarm_rate": 0.030583873957367932
+      },
+      {
+        "round": 17,
+        "accuracy": 0.7986603974449965,
+        "macro_f1": 0.6046576780033494,
+        "detection_rate": 0.7211875633133328,
+        "false_alarm_rate": 0.031098753990320256
+      },
+      {
+        "round": 18,
+        "accuracy": 0.7857523066004258,
+        "macro_f1": 0.6088384902299131,
+        "detection_rate": 0.6782513831528092,
+        "false_alarm_rate": 0.029657089898053754
+      },
+      {
+        "round": 19,
+        "accuracy": 0.7851756564939674,
+        "macro_f1": 0.6218781912041155,
+        "detection_rate": 0.6721733032026805,
+        "false_alarm_rate": 0.028936257851920503
+      },
+      {
+        "round": 20,
+        "accuracy": 0.801499290276792,
+        "macro_f1": 0.6021555301589815,
+        "detection_rate": 0.7337333437232136,
+        "false_alarm_rate": 0.030583873957367932
+      },
+      {
+        "round": 21,
+        "accuracy": 0.7917405961674947,
+        "macro_f1": 0.5924625601223289,
+        "detection_rate": 0.7080183900880542,
+        "false_alarm_rate": 0.028524353825558645
+      },
+      {
+        "round": 22,
+        "accuracy": 0.792583392476934,
+        "macro_f1": 0.5981604167648022,
+        "detection_rate": 0.7109015818592691,
+        "false_alarm_rate": 0.03027494593759654
+      },
+      {
+        "round": 23,
+        "accuracy": 0.790986515259049,
+        "macro_f1": 0.5948202398506174,
+        "detection_rate": 0.7124600638977636,
+        "false_alarm_rate": 0.03305529811553908
+      },
+      {
+        "round": 24,
+        "accuracy": 0.7875709723207949,
+        "macro_f1": 0.6080516987355356,
+        "detection_rate": 0.6809008026182498,
+        "false_alarm_rate": 0.028112449799196786
+      },
+      {
+        "round": 25,
+        "accuracy": 0.7776348474095103,
+        "macro_f1": 0.5774813802125502,
+        "detection_rate": 0.6651601340294553,
+        "false_alarm_rate": 0.027391617753063535
+      },
+      {
+        "round": 26,
+        "accuracy": 0.7800301632363378,
+        "macro_f1": 0.6280408735201182,
+        "detection_rate": 0.6562767864100366,
+        "false_alarm_rate": 0.027288641746473073
+      },
+      {
+        "round": 27,
+        "accuracy": 0.7878371185237757,
+        "macro_f1": 0.5908867609423206,
+        "detection_rate": 0.6981999532455389,
+        "false_alarm_rate": 0.028112449799196786
+      },
+      {
+        "round": 28,
+        "accuracy": 0.7837562100780695,
+        "macro_f1": 0.5809637686366133,
+        "detection_rate": 0.6861996415491312,
+        "false_alarm_rate": 0.027391617753063535
+      },
+      {
+        "round": 29,
+        "accuracy": 0.7817157558552165,
+        "macro_f1": 0.6003797713458582,
+        "detection_rate": 0.666640691966025,
+        "false_alarm_rate": 0.027391617753063535
+      },
+      {
+        "round": 30,
+        "accuracy": 0.7792317246273953,
+        "macro_f1": 0.6097748606835702,
+        "detection_rate": 0.654484532065768,
+        "false_alarm_rate": 0.026567809700339822
+      }
+    ]
+  }
+}
