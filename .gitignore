@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Node / Hardhat
+node_modules/
+artifacts/
+cache/
+typechain-types/
+
+# Data, models and per-node secrets (identity secrets, keys) - never commit
+data/
+models/
+.nodes/
+deployments/localhost.json
+deployments/hardhat.json
+*.key
+.env
+
+# ZK build scratch (final artifacts in circuits/build/ ARE committed)
+circuits/build/tmp/
+*.ptau
+*.wtns
+*.r1cs
+*.sym
+
+# OS / editors
+.DS_Store
+__MACOSX/
+.vscode/
+.idea/
