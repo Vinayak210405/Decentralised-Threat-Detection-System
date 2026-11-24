@@ -1,0 +1,392 @@
+{
+  "dataset": {
+    "dataset": "nsl-kdd",
+    "train_rows": 125973,
+    "test_rows": 22544,
+    "features": 40,
+    "categorical_features": [
+      "protocol_type",
+      "service",
+      "flag"
+    ],
+    "train_class_counts": {
+      "Normal": 67343,
+      "DoS": 45927,
+      "Probe": 11656,
+      "R2L": 995,
+      "U2R": 52
+    },
+    "test_class_counts": {
+      "Normal": 9711,
+      "DoS": 7460,
+      "R2L": 2885,
+      "Probe": 2421,
+      "U2R": 67
+    },
+    "notes": [
+      "official KDDTest+ split; 3750 test rows (16.6%) are 17 attack types never seen in training: apache2, httptunnel, mailbomb, mscan, named, processtable, ps, saint, sendmail, snmpgetattack, snmpguess, sqlattack, udpstorm, worm, xlock, xsnoop, xterm"
+    ]
+  },
+  "models": {
+    "logreg": {
+      "accuracy": 0.7626419446415897,
+      "macro_f1": 0.5861104752903044,
+      "weighted_f1": 0.7438163863434785,
+      "detection_rate": 0.7006935245071301,
+      "false_alarm_rate": 0.09288435794459891,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6963636363636364,
+          "recall": 0.9071156420554011,
+          "f1": 0.7878896292652385,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9617689940061558,
+          "recall": 0.7958445040214477,
+          "f1": 0.870974840460647,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.6642933428266287,
+          "recall": 0.7707558859975217,
+          "f1": 0.7135755258126195,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.7222946544980443,
+          "recall": 0.19202772963604853,
+          "f1": 0.30339539978094193,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.18620689655172415,
+          "recall": 0.40298507462686567,
+          "f1": 0.25471698113207547,
+          "support": 67
+        }
+      },
+      "confusion_matrix": [
+        [
+          8809,
+          75,
+          710,
+          72,
+          45
+        ],
+        [
+          1350,
+          5937,
+          123,
+          0,
+          50
+        ],
+        [
+          278,
+          159,
+          1866,
+          116,
+          2
+        ],
+        [
+          2198,
+          2,
+          110,
+          554,
+          21
+        ],
+        [
+          15,
+          0,
+          0,
+          25,
+          27
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8159198502697347,
+      "detection_rate_novel_attacks": 0.4216,
+      "description": "Logistic regression, class-balanced (linear baseline)",
+      "train_seconds": 33.90930088199997,
+      "inference_ms_per_1k": 1.9742899219309598,
+      "confusion_png": "confusion_logreg.png"
+    },
+    "rf": {
+      "accuracy": 0.7350514549325763,
+      "macro_f1": 0.47530901861407016,
+      "weighted_f1": 0.6872618336436547,
+      "detection_rate": 0.5723525286371075,
+      "false_alarm_rate": 0.0260529296673875,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6328114545697846,
+          "recall": 0.9739470703326125,
+          "f1": 0.7671655108082898,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9610169491525423,
+          "recall": 0.760053619302949,
+          "f1": 0.8488023952095808,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8513674197384067,
+          "recall": 0.5914911193721603,
+          "f1": 0.6980258347550573,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.75,
+          "recall": 0.003119584055459272,
+          "f1": 0.006213324128408699,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.5,
+          "recall": 0.029850746268656716,
+          "f1": 0.056338028169014086,
+          "support": 67
+        }
+      },
+      "confusion_matrix": [
+        [
+          9458,
+          67,
+          185,
+          0,
+          1
+        ],
+        [
+          1729,
+          5670,
+          61,
+          0,
+          0
+        ],
+        [
+          826,
+          163,
+          1432,
+          0,
+          0
+        ],
+        [
+          2871,
+          0,
+          4,
+          9,
+          1
+        ],
+        [
+          62,
+          0,
+          0,
+          3,
+          2
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.7532753495541121,
+      "detection_rate_novel_attacks": 0.13413333333333333,
+      "description": "Random forest, 200 trees, balanced class weights per bootstrap",
+      "train_seconds": 10.446175246999985,
+      "inference_ms_per_1k": 10.898800922640742,
+      "confusion_png": "confusion_rf.png"
+    },
+    "hgb": {
+      "accuracy": 0.8008782824698367,
+      "macro_f1": 0.664800013078241,
+      "weighted_f1": 0.7843613662640586,
+      "detection_rate": 0.7058365152341619,
+      "false_alarm_rate": 0.02934816187828236,
+      "per_class": {
+        "Normal": {
+          "precision": 0.7140368153927733,
+          "recall": 0.9706518381217176,
+          "f1": 0.822800279329609,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9626535626535626,
+          "recall": 0.7878016085790884,
+          "f1": 0.8664946553630667,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8127118644067797,
+          "recall": 0.7922346137959521,
+          "f1": 0.8023426061493412,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.9599528857479388,
+          "recall": 0.2824956672443674,
+          "f1": 0.4365291912158543,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.6551724137931034,
+          "recall": 0.2835820895522388,
+          "f1": 0.3958333333333333,
+          "support": 67
+        }
+      },
+      "confusion_matrix": [
+        [
+          9426,
+          62,
+          215,
+          5,
+          3
+        ],
+        [
+          1372,
+          5877,
+          208,
+          3,
+          0
+        ],
+        [
+          313,
+          166,
+          1918,
+          24,
+          0
+        ],
+        [
+          2045,
+          0,
+          18,
+          815,
+          7
+        ],
+        [
+          45,
+          0,
+          1,
+          2,
+          19
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.8446548497192558,
+      "detection_rate_novel_attacks": 0.3696,
+      "description": "Histogram gradient boosting, balanced class weights",
+      "train_seconds": 8.985623801999964,
+      "inference_ms_per_1k": 7.332386843505483,
+      "confusion_png": "confusion_hgb.png"
+    },
+    "mlp": {
+      "accuracy": 0.7698278921220724,
+      "macro_f1": 0.6233471637278136,
+      "weighted_f1": 0.7409394542028818,
+      "detection_rate": 0.6396789527000701,
+      "false_alarm_rate": 0.02955411389146329,
+      "per_class": {
+        "Normal": {
+          "precision": 0.6708428246013668,
+          "recall": 0.9704458861085367,
+          "f1": 0.7932993812870912,
+          "support": 9711
+        },
+        "DoS": {
+          "precision": 0.9590952839268527,
+          "recall": 0.8014745308310992,
+          "f1": 0.8732291514531911,
+          "support": 7460
+        },
+        "Probe": {
+          "precision": 0.8411732152739347,
+          "recall": 0.6278397356464271,
+          "f1": 0.7190160832544938,
+          "support": 2421
+        },
+        "R2L": {
+          "precision": 0.9578454332552693,
+          "recall": 0.1417677642980936,
+          "f1": 0.2469806763285024,
+          "support": 2885
+        },
+        "U2R": {
+          "precision": 0.8214285714285714,
+          "recall": 0.34328358208955223,
+          "f1": 0.4842105263157895,
+          "support": 67
+        }
+      },
+      "confusion_matrix": [
+        [
+          9424,
+          70,
+          209,
+          3,
+          5
+        ],
+        [
+          1429,
+          5979,
+          52,
+          0,
+          0
+        ],
+        [
+          709,
+          185,
+          1520,
+          7,
+          0
+        ],
+        [
+          2450,
+          0,
+          26,
+          409,
+          0
+        ],
+        [
+          36,
+          0,
+          0,
+          8,
+          23
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "DoS",
+        "Probe",
+        "R2L",
+        "U2R"
+      ],
+      "novel_attack_rows": 3750,
+      "detection_rate_known_attacks": 0.7999559616866674,
+      "detection_rate_novel_attacks": 0.25146666666666667,
+      "description": "Multi-layer perceptron (128-64), Adam, early stopping",
+      "train_seconds": 21.73078065200002,
+      "inference_ms_per_1k": 4.043381343152055,
+      "confusion_png": "confusion_mlp.png"
+    }
+  }
+}
