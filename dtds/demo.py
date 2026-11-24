@@ -59,7 +59,7 @@ def banner(text):
 def npx():
     exe = shutil.which("npx") or shutil.which("npx.cmd")
     if not exe:
-        sys.exit("npx (Node.js) not found. Install Node.js 18+ and run `npm install`.")
+        sys.exit("npx (Node.js) not found. Install Node.js 22+ and run `npm install`.")
     return exe
 
 

@@ -130,7 +130,7 @@ This is a research prototype. It is honest about where its guarantees stop:
 
 ## Reproduce
 
-Requirements: **Python 3.10+**, **Node.js 18+**. `circom` is only needed to rebuild the circuit; compiled artifacts are committed.
+Requirements: **Python 3.10+**, **Node.js 22+** (Hardhat's runtime requires it; check with `node -v`). `circom` is only needed to rebuild the circuit; compiled artifacts are committed.
 
 ```bash
 git clone https://github.com/Vinayak210405/Decentralised-Threat-Detection-System
