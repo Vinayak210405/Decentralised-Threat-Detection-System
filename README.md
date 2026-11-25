@@ -103,6 +103,22 @@ Each company sees normal traffic plus **only its own attack types** (A: DoS + pr
 
 Federated training gets within about 1 point of the pooled-data model without any company sharing a single flow. Standard sample-weighted FedAvg reaches 49.7%: the largest company drowns out rare attacks only smaller companies have seen, which equal per-company weighting fixes. Full table (including Dirichlet and IID splits): [`reports/ml/nsl-kdd/federated_summary.md`](reports/ml/nsl-kdd/federated_summary.md).
 
+### Privacy for federated learning (`dtds/ml/private_fl.py`)
+
+Model updates can leak training data, so federated training now has two protections:
+
+* **Secure aggregation.** Each pair of companies agrees on a secret by X25519 key exchange and derives a ChaCha20 mask from it. One adds the mask, the other subtracts it, so the masks cancel exactly in the sum (fixed-point arithmetic mod 2^32). The aggregator learns only the total, never one company's update. Tested: the masked protocol trains the same model as plain FedAvg, and a single masked update has a correlation of under 0.05 with the real one.
+* **Differential privacy.** Each update is clipped to norm 1, and each company adds its share of Gaussian noise, so no one ever sees an un-noised update. ε is computed with a Rényi-DP accountant over all 30 rounds (client-level, δ = 10⁻⁵).
+
+| Macro-F1 (NSL-KDD, single seed) | No DP noise | ε ≈ 41 | ε ≈ 10 | ε ≈ 4.8 |
+|---|---|---|---|---|
+| 3 companies | 65.8% | 35.0% | 20.8% | 11.4% |
+| 10 companies | 62.9% | 42.7% | 40.3% | 34.5% |
+| 30 companies | 60.0% | 55.5% | 56.1% | 43.9% |
+| **100 companies** | 57.7% | 55.0% | **54.5%** | **47.7%** |
+
+**Strong privacy is only affordable with many participants.** The noise on the average shrinks as 1/(number of companies), so with 3 companies any meaningful ε destroys the model, while with 100 companies ε ≈ 10 costs about 3 points (false alarms 9.2% vs 7.2%). Secure aggregation alone has no accuracy cost. Not implemented: recovery when a company drops out mid-round (the full Bonawitz et al. protocol secret-shares the keys for that). [`reports/ml/nsl-kdd/private_fl.md`](reports/ml/nsl-kdd/private_fl.md).
+
 ### End-to-end demo (`python -m dtds.demo`, about 40 s)
 
 A real local chain, real Groth16 proofs, the trained detector, and the team's sample threat reports:
@@ -152,6 +168,7 @@ flowchart LR
 | ML detection | [`dtds/ml/`](dtds/ml) | Dataset loaders (NSL-KDD, UNSW-NB15, CIC-IDS2017), signed-log + scaling + one-hot preprocessing, 4 classifiers, per-class and novel-attack evaluation |
 | Zeek ingestion | [`dtds/ingest/`](dtds/ingest) | Reads Zeek `conn.log` (TSV or JSON), rebuilds 26 NSL-KDD features, network-only models, baseline calibration |
 | Novel-attack detection | [`dtds/ml/novelty.py`](dtds/ml/novelty.py) | Hybrid classifier + anomaly detector (autoencoder, isolation forest or kNN) trained on normal traffic, evaluated at matched false-alarm rates and leave-one-family-out |
+| Private federated learning | [`dtds/ml/private_fl.py`](dtds/ml/private_fl.py) | Secure aggregation (X25519 + ChaCha20 pairwise masks), clipping + distributed Gaussian noise, Rényi-DP accountant |
 | Federated learning | [`dtds/ml/federated.py`](dtds/ml/federated.py) | FedAvg from scratch, federated feature scaling from aggregated statistics, non-IID partitions, class-balanced local loss |
 | Report ingestion | [`dtds/extraction/`](dtds/extraction) | Text from PDF, DOCX, HTML, STIX/JSON, email, XLSX; refanging (`hxxp`, `[.]`), private/documentation IP filtering, benign allowlist, canonical IOC form |
 | Keyed IOC hashing | [`dtds/sharing/ioc_hash.py`](dtds/sharing/ioc_hash.py) | HMAC-SHA256 under a consortium key, sized to the SNARK field |
@@ -180,7 +197,7 @@ This is a research prototype. It is honest about where its guarantees stop:
 * **Attackers rotate infrastructure.** Blocking on a shared IP only works while the attacker reuses it. The federated model is the complementary defence: it generalises across attack *behaviour*, not addresses.
 * **Single-party trusted setup.** The Groth16 phase-2 setup in `circuits/build/` was run by one machine. That's fine for a demo, but a real consortium must run a multi-party ceremony so no single party could forge proofs.
 * **Relayer.** Anonymity on-chain requires submitting through a relayer (or fresh addresses). The demo uses one shared dev account to model this.
-* **Federated learning shares weights.** Model updates can leak information about training data (gradient inversion). Secure aggregation or differential privacy would be the next step; neither is implemented.
+* **Federated learning privacy needs scale.** Secure aggregation and differential privacy are implemented, but meaningful ε only keeps the model useful with about 100 companies, and the secure-aggregation protocol doesn't survive a company dropping out mid-round.
 * **Datasets.** NSL-KDD is old (derived from 1999 traffic) but has an official split with novel attacks. UNSW-NB15 (2015) is the modern check; the federated-learning experiments have not been repeated on it yet.
 * **Threshold choice.** A higher threshold resists colluding members but warns later. It is a governance parameter (changeable by vote).
 
@@ -205,6 +222,7 @@ Experiments (NSL-KDD downloads automatically, about 20 MB):
 python -m dtds.ml.train --dataset nsl-kdd                                   # 4 models, ~1.5 min
 python -m dtds.ml.federated --partition by-attack --aggregation uniform     # ~1.5 min
 python scripts/fl_multiseed.py --seeds 1 2 3 4 5                            # ~25 min
+python -m dtds.ml.private_fl --companies 3,10,30,100 --sigmas 0,1,3,6      # ~20 min
 python -m dtds.ml.train --dataset unsw-nb15                                 # downloads ~47 MB, checksum-verified
 python -m dtds.ml.novelty --dataset nsl-kdd                                 # hybrid detector, ~4 min
 python -m dtds.ml.novelty --dataset unsw-nb15                               # leave-one-family-out, ~25 min
