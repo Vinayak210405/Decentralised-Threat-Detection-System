@@ -1,0 +1,5 @@
+ioc,type,source,confidence
+192.168.1.1,ip,CISA,high
+44d88612fea8a8f36de82e1278abb02f,md5,AlienVault,medium
+2fd4e1c67a2d28fced849ee1bb76e7391b93eb12,sha1,MISP,high
+https://malicious-domain.com/payload.exe,url,CISA,medium

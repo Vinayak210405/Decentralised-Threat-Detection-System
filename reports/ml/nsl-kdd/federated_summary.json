@@ -1,0 +1,219 @@
+{
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "runs": {
+    "by-attack / samples": [
+      {
+        "federated_macro_f1": 0.5333619580701455,
+        "centralised_macro_f1": 0.542906854735712,
+        "local_mean_macro_f1": 0.27066609482167603,
+        "federated_detection": 0.6718616067949816,
+        "local_mean_detection": 0.2477207200187018,
+        "federated_far": 0.03161363402327258,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.487751201739139
+      },
+      {
+        "federated_macro_f1": 0.4824103112520327,
+        "centralised_macro_f1": 0.5301692078123972,
+        "local_mean_macro_f1": 0.27647010619378193,
+        "federated_detection": 0.6369516091327048,
+        "local_mean_detection": 0.23096703810488584,
+        "federated_far": 0.030583873957367932,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.46661399054511116
+      },
+      {
+        "federated_macro_f1": 0.48288838796513983,
+        "centralised_macro_f1": 0.6304177490984884,
+        "local_mean_macro_f1": 0.28568650704407433,
+        "federated_detection": 0.618717369282319,
+        "local_mean_detection": 0.21951219512195122,
+        "federated_far": 0.031201729996910718,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.4570344569357143
+      },
+      {
+        "federated_macro_f1": 0.48857076873578986,
+        "centralised_macro_f1": 0.6229157438337201,
+        "local_mean_macro_f1": 0.2876517658083449,
+        "federated_detection": 0.6276007169017377,
+        "local_mean_detection": 0.22972025247409023,
+        "federated_far": 0.03151065801668211,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.46117703431312407
+      },
+      {
+        "federated_macro_f1": 0.49556813482902246,
+        "centralised_macro_f1": 0.6235955711850318,
+        "local_mean_macro_f1": 0.2824851646424251,
+        "federated_detection": 0.6382763188654251,
+        "local_mean_detection": 0.2304994934933375,
+        "federated_far": 0.034393986201215115,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.4671784772443986
+      }
+    ],
+    "by-attack / uniform": [
+      {
+        "federated_macro_f1": 0.5598310220069049,
+        "centralised_macro_f1": 0.542906854735712,
+        "local_mean_macro_f1": 0.27066609482167603,
+        "federated_detection": 0.6245616769266734,
+        "local_mean_detection": 0.2477207200187018,
+        "federated_far": 0.028318401812377717,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.47418503244413196
+      },
+      {
+        "federated_macro_f1": 0.5585237453712887,
+        "centralised_macro_f1": 0.5301692078123972,
+        "local_mean_macro_f1": 0.27647010619378193,
+        "federated_detection": 0.62269149848048,
+        "local_mean_detection": 0.23096703810488584,
+        "federated_far": 0.021933889403768923,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.485772747061659
+      },
+      {
+        "federated_macro_f1": 0.5602772078603524,
+        "centralised_macro_f1": 0.6304177490984884,
+        "local_mean_macro_f1": 0.28568650704407433,
+        "federated_detection": 0.6127172134341152,
+        "local_mean_detection": 0.21951219512195122,
+        "federated_far": 0.02790649778601586,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.47433182570463267
+      },
+      {
+        "federated_macro_f1": 0.6218822492833752,
+        "centralised_macro_f1": 0.6229157438337201,
+        "local_mean_macro_f1": 0.2876517658083449,
+        "federated_detection": 0.6067949816878361,
+        "local_mean_detection": 0.22972025247409023,
+        "federated_far": 0.025744001647616106,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.46330567731332106
+      },
+      {
+        "federated_macro_f1": 0.5849606336271929,
+        "centralised_macro_f1": 0.6235955711850318,
+        "local_mean_macro_f1": 0.2824851646424251,
+        "federated_detection": 0.618717369282319,
+        "local_mean_detection": 0.2304994934933375,
+        "federated_far": 0.028524353825558645,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.47388978575738167
+      }
+    ],
+    "dirichlet / samples": [
+      {
+        "federated_macro_f1": 0.6293925439462036,
+        "centralised_macro_f1": 0.542906854735712,
+        "local_mean_macro_f1": 0.597599413728584,
+        "federated_detection": 0.7150315592612795,
+        "local_mean_detection": 0.6438608795033637,
+        "federated_far": 0.030583873957367932,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.6443556372458923,
+        "centralised_macro_f1": 0.5301692078123972,
+        "local_mean_macro_f1": 0.5248558321931857,
+        "federated_detection": 0.7238369827787735,
+        "local_mean_detection": 0.6620171952518247,
+        "federated_far": 0.07342189269900114,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.6607717041800643
+      },
+      {
+        "federated_macro_f1": 0.5194274777604304,
+        "centralised_macro_f1": 0.6304177490984884,
+        "local_mean_macro_f1": 0.4765381361738483,
+        "federated_detection": 0.6317306943037482,
+        "local_mean_detection": 0.7599158419699213,
+        "federated_far": 0.02934816187828236,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.4853259190608588
+      },
+      {
+        "federated_macro_f1": 0.6539073440681047,
+        "centralised_macro_f1": 0.6229157438337201,
+        "local_mean_macro_f1": 0.5623707650403859,
+        "federated_detection": 0.6969531676147432,
+        "local_mean_detection": 0.6529520247279149,
+        "federated_far": 0.05251776336113686,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.5115666243664985,
+        "centralised_macro_f1": 0.6235955711850318,
+        "local_mean_macro_f1": 0.4380953802470164,
+        "federated_detection": 0.6004831294319333,
+        "local_mean_detection": 0.6146133665809501,
+        "federated_far": 0.025435073627844713,
+        "unseen_local": 0.0,
+        "unseen_federated": 0.5957548981943911
+      }
+    ],
+    "iid / samples": [
+      {
+        "federated_macro_f1": 0.6123477896214343,
+        "centralised_macro_f1": 0.542906854735712,
+        "local_mean_macro_f1": 0.6005437230907361,
+        "federated_detection": 0.7314735447673966,
+        "local_mean_detection": 0.656744331021585,
+        "federated_far": 0.07826176500875295,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.6552957669404538,
+        "centralised_macro_f1": 0.5301692078123972,
+        "local_mean_macro_f1": 0.5669692348367649,
+        "federated_detection": 0.7531364451024702,
+        "local_mean_detection": 0.6730824177251357,
+        "federated_far": 0.07887962104829575,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.677136954442741,
+        "centralised_macro_f1": 0.6304177490984884,
+        "local_mean_macro_f1": 0.6003534007058239,
+        "federated_detection": 0.704667653705291,
+        "local_mean_detection": 0.6976025351307826,
+        "federated_far": 0.07980640510760993,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.6052773673528379,
+        "centralised_macro_f1": 0.6229157438337201,
+        "local_mean_macro_f1": 0.5992881485154405,
+        "federated_detection": 0.7107457336554196,
+        "local_mean_detection": 0.6864334138549054,
+        "federated_far": 0.03140768201009165,
+        "unseen_local": null,
+        "unseen_federated": null
+      },
+      {
+        "federated_macro_f1": 0.6391341096693134,
+        "centralised_macro_f1": 0.6235955711850318,
+        "local_mean_macro_f1": 0.6186112581284655,
+        "federated_detection": 0.6959401542897218,
+        "local_mean_detection": 0.6771604457258631,
+        "federated_far": 0.07548141283081042,
+        "unseen_local": null,
+        "unseen_federated": null
+      }
+    ]
+  }
+}

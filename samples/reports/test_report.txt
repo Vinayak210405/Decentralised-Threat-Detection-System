@@ -1,0 +1,19 @@
+The threat actor known as H A M A S has been associated with a series of spear-phishing attacks targeting defense contractors.
+
+They delivered payloads from:
+
+- hxxp://download[.]malwar3[.]xyz/index.php
+- 185[.]100[.]87[.]202 (c2 node disguised behind CDN)
+
+The implants used SHA1 fingerprint: 2FD4E1C67A2D28FCED849ee1BB76E7391b93EB12
+(Some characters capitalized inconsistently)
+
+ATT&CK reference: T 1 5 6 6 . 0 0 2
+
+Payload also dropped from www[.]exfiltrate[.]co[.]uk, but hidden behind a redirection tunnel.
+
+IoC appeared inline within server config: `set target = 51[.]91[.]12[.]55`
+
+This campaign was referred to internally as Operation D A R K S T O R M.
+
+Document metadata indicates staging on 2025-06-01.
