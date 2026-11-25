@@ -10,9 +10,10 @@ Supported datasets
 * ``nsl-kdd``     - downloaded automatically (~20 MB). Uses the official
                     KDDTrain+/KDDTest+ split; the test set deliberately contains
                     attack types that never appear in training.
-* ``unsw-nb15``   - download the "training-set" and "testing-set" CSVs from
-                    https://research.unsw.edu.au/projects/unsw-nb15-dataset and
-                    put them in ``data/raw/unsw-nb15/``.
+* ``unsw-nb15``   - downloaded automatically (~47 MB, checksum-verified), or put
+                    the official "training-set" and "testing-set" CSVs from
+                    https://research.unsw.edu.au/projects/unsw-nb15-dataset in
+                    ``data/raw/unsw-nb15/``.
 * ``cic-ids2017`` - download "MachineLearningCSV.zip" from
                     https://www.unb.ca/cic/datasets/ids-2017.html and extract
                     the CSVs into ``data/raw/cic-ids2017/``.
@@ -175,28 +176,82 @@ def load_nsl_kdd(root: Optional[Path] = None) -> Dataset:
 # --------------------------------------------------------------------------- #
 # UNSW-NB15
 # --------------------------------------------------------------------------- #
+# SHA-256 of the official CSVs the committed results were produced with.
+UNSW_NB15_SHA256 = {
+    "UNSW_NB15_training-set.csv": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+    "UNSW_NB15_testing-set.csv": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+}
+
+
+# The official site serves the CSVs through a SharePoint folder that scripts
+# can't fetch, so the automatic download uses a GitHub mirror and accepts the
+# files ONLY if their SHA-256 matches the hashes above (whose class counts match
+# the paper's published counts exactly).
+UNSW_NB15_MIRROR = ("https://media.githubusercontent.com/media/jamshaid120/"
+                    "UNSW_NB15-Complete-dataset/HEAD/{name}")
+
+
+def download_unsw_nb15(dest: Optional[Path] = None) -> Path:
+    dest = ensure(dest or RAW_DIR / "unsw-nb15")
+    for name, digest in UNSW_NB15_SHA256.items():
+        target = dest / name
+        if not target.exists():
+            print(f"Downloading {name} (mirror, checksum-verified) ...")
+            urllib.request.urlretrieve(UNSW_NB15_MIRROR.format(name=name), target)
+        if _sha256(target) != digest:
+            target.unlink()
+            raise ValueError(f"{name} failed its SHA-256 check and was deleted. Download the official "
+                             "files from https://research.unsw.edu.au/projects/unsw-nb15-dataset instead.")
+    return dest
+
+
 def load_unsw_nb15(root: Optional[Path] = None) -> Dataset:
+    """UNSW-NB15 partitioned sets (Moustafa & Slay, 2015).
+
+    Two quirks of the official release are handled here:
+    * the files are named the wrong way round: "training-set" has 82,332 rows
+      and "testing-set" 175,341, while the paper defines the TRAINING set as
+      175,341 records. We follow the paper: train on the larger file.
+    * the CSVs start with a UTF-8 byte-order mark, which would otherwise turn
+      the first column name into "\\ufeffid".
+    """
     root = Path(root or RAW_DIR / "unsw-nb15")
-    files = {s: next(iter(sorted(root.glob(f"*{s}*set*.csv"))), None) for s in ("training", "testing")}
-    if not all(files.values()):
+    files = sorted(root.glob("*set*.csv"))
+    if not files:
+        download_unsw_nb15(root)
+        files = sorted(root.glob("*set*.csv"))
+    if len(files) != 2:
         raise FileNotFoundError(
             f"Put UNSW_NB15_training-set.csv and UNSW_NB15_testing-set.csv in {root}. "
             "Download: https://research.unsw.edu.au/projects/unsw-nb15-dataset")
+    notes = []
+    for f in files:
+        expected = UNSW_NB15_SHA256.get(f.name)
+        if expected and _sha256(f) != expected:
+            notes.append(f"{f.name} differs from the file the committed results used")
 
-    def split(path):
-        df = pd.read_csv(path)
+    def read(path):
+        df = pd.read_csv(path, encoding="utf-8-sig")
         df.columns = [c.strip() for c in df.columns]
+        return df
+
+    a, b = (read(f) for f in files)
+    train, test = (a, b) if len(a) >= len(b) else (b, a)
+
+    def split(df):
         y = df["attack_cat"].fillna("Normal").astype(str).str.strip()
         y = y.replace({"Backdoors": "Backdoor"}).rename("label")
         X = df.drop(columns=[c for c in ("id", "label", "attack_cat") if c in df.columns])
         return X, y
 
-    X_tr, y_tr = split(files["training"])
-    X_te, y_te = split(files["testing"])
+    X_tr, y_tr = split(train)
+    X_te, y_te = split(test)
     cat = [c for c in ("proto", "service", "state") if c in X_tr.columns]
     num = [c for c in X_tr.columns if c not in cat]
-    return Dataset("unsw-nb15", X_tr, y_tr, X_te, y_te, cat, num,
-                   ["official UNSW-NB15 training/testing split"])
+    notes.insert(0, "official partitioned sets, following the paper: the 175,341-row file is used "
+                    "for training (the release names the files the other way round)")
+    return Dataset("unsw-nb15", X_tr, y_tr, X_te, y_te, cat, num, notes,
+                   y_test_detail=y_te.rename("attack"))
 
 
 # --------------------------------------------------------------------------- #
