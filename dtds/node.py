@@ -123,12 +123,18 @@ class CompanyNode:
             blocked = src.map(lambda ip: hashes.get(ip) in self.watchlist).to_numpy()
 
         passed = flows.loc[~blocked]
-        pipe = self.detector["pipeline"]
         feats = passed[self.detector["features"]]
-        proba = pipe.predict_proba(feats)
-        classes = list(pipe.classes_)
-        pred = np.array(classes)[proba.argmax(axis=1)]
-        conf = proba.max(axis=1)
+        if "hybrid" in self.detector:
+            # Classifier + anomaly detector (dtds.ml.novelty). Its alarm threshold is
+            # already calibrated to a false-alarm budget, so every alarm counts as
+            # confident; flows only the anomaly detector flags are labelled Unknown.
+            pred = self.detector["hybrid"].predict(feats)
+            conf = np.where(pred != "Normal", 1.0, 0.0)
+        else:
+            pipe = self.detector["pipeline"]
+            proba = pipe.predict_proba(feats)
+            pred = np.array(list(pipe.classes_))[proba.argmax(axis=1)]
+            conf = proba.max(axis=1)
         is_attack = pred != "Normal"
 
         per_source: Dict[str, Dict] = {}
