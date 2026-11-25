@@ -47,6 +47,8 @@ def main(argv=None):
     ap.add_argument("--target-far", type=float, default=0.02, help="false-alarm budget for --baseline")
     ap.add_argument("--model", type=Path, default=None, help="override the model file")
     ap.add_argument("--min-flows", type=int, default=5, help="attack flows needed to report a source")
+    ap.add_argument("--min-share", type=float, default=0.2,
+                    help="share of a source's connections that must be flagged to report it")
     ap.add_argument("--node-dir", type=Path, default=NODES_DIR / "ingest")
     args = ap.parse_args(argv)
 
@@ -66,7 +68,7 @@ def main(argv=None):
               f"({args.target_far:.0%} false-alarm budget)")
     else:
         print("Classifier only (pass --baseline to enable the calibrated hybrid detector)")
-    result = node.process_traffic(flows, min_flows=args.min_flows)
+    result = node.process_traffic(flows, min_flows=args.min_flows, min_share=args.min_share)
     print(f"Flagged as attacks: {result.flagged_by_model:,} of {result.total_flows:,} connections\n")
     external = {ip: v for ip, v in result.per_source.items() if not is_internal(ip)}
     print(f"{'source':<18}{'connections':>12}{'flagged':>10}")

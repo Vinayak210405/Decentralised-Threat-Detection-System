@@ -49,6 +49,17 @@ The NSL-KDD test set is deliberately hard: 16.6% of its rows are 17 attack types
 
 UNSW-NB15 is modern (2015) traffic with 9 attack families. Its official test set is known for normal traffic that differs from the training set, so every model over-alarms on normal flows; as attack-vs-normal, the random forest scores 87.9% accuracy, in line with published results on this split. The release names its two files the wrong way round; [`dtds/ml/datasets.py`](dtds/ml/datasets.py) follows the paper (train on the 175,341-row file) and verifies checksums. [`reports/ml/unsw-nb15/results.md`](reports/ml/unsw-nb15/results.md).
 
+### Intrusion detection (CIC-IDS2017, 2.8 million flows)
+
+| Model | Accuracy | Macro-F1 | Detection rate | False alarms |
+|---|---|---|---|---|
+| Logistic regression | 94.8% | 65.7% | 99.9% | 6.2% |
+| Random forest | 99.8% | 95.8% | 99.4% | 0.1% |
+| **Gradient boosting** | **99.8%** | **96.0%** | 99.8% | 0.2% |
+| MLP (128-64) | 99.8% | 92.8% | 99.5% | 0.1% |
+
+These are the usual near-perfect CIC-IDS2017 numbers, and they come from a random 80/20 split, which is known to be optimistic: 329,896 exact duplicate rows (12%) were removed first, and near-duplicates still land on both sides. The test that matters is below: with one attack family held out of training, the same classifier catches only **45%** of it at 2% false alarms. Loader details (checksum-verified download, cleaning steps, rare classes kept whole when sampling 600k rows): [`dtds/ml/datasets.py`](dtds/ml/datasets.py); results: [`reports/ml/cic-ids2017/results.md`](reports/ml/cic-ids2017/results.md).
+
 ### Catching attacks the model has never seen (`dtds/ml/novelty.py`)
 
 A hybrid detector adds an **autoencoder trained only on normal traffic** to the classifier: whatever doesn't look normal raises its score, attack labels or not. Detectors are compared **at the same false-alarm rate**, because any detector catches more when allowed more false alarms.
@@ -59,8 +70,10 @@ A hybrid detector adds an **autoencoder trained only on normal traffic** to the 
 | NSL-KDD: **hybrid** | 7.7% | **80.3%** | **82.9%** |
 | UNSW-NB15, mean of 9 held-out families: classifier alone | 62.9% | **73.4%** | **82.6%** |
 | UNSW-NB15: **hybrid** | **66.4%** | 70.5% | 77.7% |
+| CIC-IDS2017, mean of 5 held-out families: classifier alone | 45.1% | 62.1% | 80.5% |
+| CIC-IDS2017: **hybrid** | **57.8%** | **80.0%** | **88.7%** |
 
-The honest summary: **the hybrid helps when a new attack looks unlike normal traffic and hurts when it imitates normal traffic.** On UNSW-NB15, held-out Generic attacks go from 2% to 99% detected and Exploits from 71% to 86%, but Reconnaissance drops from 75% to 25% and Shellcode from 27% to 1%. So it ships as an option, not the default. Two more findings came out of this:
+The honest summary: **the hybrid helps when a new attack looks unlike normal traffic and hurts when it imitates normal traffic.** On UNSW-NB15, held-out Generic attacks go from 2% to 99% detected and Exploits from 71% to 86%, but Reconnaissance drops from 75% to 25% and Shellcode from 27% to 1%. So it ships as an option, not the default. CIC-IDS2017 is the cleanest test, because the hybrid's design (the combination rule and the autoencoder) was fixed before that dataset was loaded: there it helps on 4 of 5 held-out families, most on DoS (31% to 77%). Two more findings came out of this:
 
 * Most of the classifier's "37% on novel attacks" is its default threshold, not the model: allowed 5% false alarms instead of 2.8%, the same classifier catches 71%.
 * Choices were made after looking at test results (the combination rule, then the autoencoder over an isolation forest, which was worse on UNSW-NB15), so every variant tried is published: [`novelty_autoencoder.md`](reports/ml/nsl-kdd/novelty_autoencoder.md), [`novelty_iforest.md`](reports/ml/nsl-kdd/novelty_iforest.md) for NSL-KDD and [the same two](reports/ml/unsw-nb15/) for UNSW-NB15.
@@ -102,6 +115,24 @@ Each company sees normal traffic plus **only its own attack types** (A: DoS + pr
 | Centralised (all data pooled; what privacy forbids) | 59.0 ± 4.4% | n/a | n/a |
 
 Federated training gets within about 1 point of the pooled-data model without any company sharing a single flow. Standard sample-weighted FedAvg reaches 49.7%: the largest company drowns out rare attacks only smaller companies have seen, which equal per-company weighting fixes. Full table (including Dirichlet and IID splits): [`reports/ml/nsl-kdd/federated_summary.md`](reports/ml/nsl-kdd/federated_summary.md).
+
+### Real traffic: Zeek logs from a cyber-defence competition
+
+The detectors were run on **1,021,950 real connections** (21 minutes) from the 2018 Western Regional Collegiate Cyber Defense Competition, where a red team attacks student-defended networks ([Brim/Zed sample Zeek logs](https://github.com/brimdata/zed-sample-data), CC BY-SA 4.0, not redistributed). There are no labels, so sources are compared with a transparent behavioural proxy: a "likely scanner" hit 100+ distinct host/port pairs with most connections failing; a "likely benign" source hit at most 10 targets with 90%+ completed. That rule is not ground truth.
+
+| On held-out sources | Scanner connections flagged | Benign connections flagged | Scanners reported | Benign sources reported |
+|---|---|---|---|---|
+| Classifier, report at 5 flagged connections | 53.9% | 1.7% | 16 / 16 | 4 / 15 |
+| **Classifier, report at 5 flagged and 20% of its connections** | 53.9% | 1.7% | **13 / 16** | **0 / 15** |
+| Hybrid, uncalibrated | 99.8% | 98.4% | 16 / 16 | 11 / 15 |
+| Hybrid, calibrated on half the benign sources | 100% | 2.1% | 16 / 16 | 7-10 / 15 |
+
+What real traffic taught, and what changed because of it:
+
+* **Reporting by count alone breaks on busy machines.** Two benign servers made about 160,000 connections each; a 2% false-alarm rate still meant thousands of flagged connections. Nodes now also require that **20% of a source's connections** are flagged (`min_share`), which removed every benign report here at the cost of 3 of 16 scanners.
+* **An uncalibrated anomaly detector is useless on a new network**: it flagged 97% of all traffic. Calibration fixes the connection-level rate (2.1%), but a baseline from a handful of sources, two of which dominate, is too narrow: many small benign sources still look unusual. On this network the classifier with the share rule is the better choice.
+
+`python scripts/zeek_case_study.py conn.log` reproduces it; [`reports/zeek-wrccdc/case_study.md`](reports/zeek-wrccdc/case_study.md).
 
 ### Privacy for federated learning (`dtds/ml/private_fl.py`)
 
@@ -215,7 +246,8 @@ This is a research prototype. It is honest about where its guarantees stop:
 * **Single-party trusted setup.** The Groth16 phase-2 setup in `circuits/build/` was run by one machine. That's fine for a demo, but a real consortium must run a multi-party ceremony so no single party could forge proofs.
 * **Relayer.** Anonymity on-chain requires submitting through a relayer (or fresh addresses). The demo uses one shared dev account to model this.
 * **Federated learning privacy needs scale.** Secure aggregation and differential privacy are implemented, but meaningful ε only keeps the model useful with about 100 companies, and the secure-aggregation protocol doesn't survive a company dropping out mid-round.
-* **Datasets.** NSL-KDD is old (derived from 1999 traffic) but has an official split with novel attacks. UNSW-NB15 (2015) is the modern check; the federated-learning experiments have not been repeated on it yet.
+* **Datasets.** NSL-KDD is old (1999-era traffic) but has an official split with novel attacks; UNSW-NB15 (2015) and CIC-IDS2017 are the modern checks. The federated-learning experiments have only been run on NSL-KDD. The CIC-IDS2017 models use CICFlowMeter features, so running them on live traffic would need CICFlowMeter rather than Zeek.
+* **Real traffic without labels.** The only real-network test (WRCCDC) has no ground truth; its "scanner" and "benign" groups come from a behavioural rule.
 * **Threshold choice.** A higher threshold resists colluding members but warns later. It is a governance parameter (changeable by vote).
 
 ## Reproduce
@@ -247,7 +279,7 @@ python -m dtds.extraction samples/reports/cisa_aa22-320a_iranian_apt.pdf    # IO
 python -m dtds.ingest samples/zeek/syn_flood.log --baseline samples/zeek/baseline.log   # Zeek log -> findings
 ```
 
-CIC-IDS2017 (about 1 GB) is not downloaded automatically: put its CSVs in `data/raw/cic-ids2017/` (link in [`dtds/ml/datasets.py`](dtds/ml/datasets.py)) and pass `--dataset cic-ids2017`. Its loader has not been run against the real files yet.
+CIC-IDS2017 downloads automatically the first time (about 880 MB, checksum-verified; loading needs about 4 GB of RAM): `python -m dtds.ml.train --dataset cic-ids2017`.
 
 Rebuild the circuit and verifier (needs `circom` 2.1.x on PATH): `npm run zk:build`.
 
