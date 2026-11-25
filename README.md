@@ -140,6 +140,23 @@ Full transcript: [`docs/demo_output.txt`](docs/demo_output.txt). The 100% is by 
 
 Proof generation takes about 1.5 s per report on a laptop CPU; `submitReport` costs about 310–340k gas.
 
+## Dashboard
+
+```bash
+python -m dtds.demo          # saves a snapshot at the end
+python -m dtds.dashboard     # open http://127.0.0.1:8050
+```
+
+For a live view, start the chain in its own terminal first (`npx hardhat node`, stop it with Ctrl+C), then run the demo and the dashboard in a second terminal: the demo reuses the running chain and leaves it up.
+
+The dashboard puts the privacy design side by side. **Public chain** shows what anyone reading the blockchain sees: keyed hashes, anonymous reports with unlinkable nullifiers, common threats, governance votes. Switching to a **company's view** adds only what that company knows itself: plain-text indicators it saw, what it reported, its blocklist and its alerts, read from its own folder. Company C, never attacked, sees three blocked threats it has never seen in plain text.
+
+| Public chain | Company A's private view |
+|---|---|
+| ![public view](docs/dashboard_public.png) | ![company view](docs/dashboard_company_a.png) |
+
+It refreshes live against a running chain, falls back to the snapshot the demo saves, and `python -m dtds.dashboard --export dashboard.html` writes a single self-contained file. Every string from reports or the chain is HTML-escaped (tested with a planted script payload in Chrome), the server listens on 127.0.0.1 only, and it sends a strict Content-Security-Policy header.
+
 ## Architecture
 
 ```mermaid
