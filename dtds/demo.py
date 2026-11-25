@@ -288,6 +288,9 @@ def main(argv=None):
         summary["early_warnings_company_c"] = len([a for a in nodes["C"].alerter.sent
                                                    if a.known_locally is None])
         (demo_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+        from dtds.dashboard.collect import build_state, save_snapshot
+        save_snapshot(build_state(reg, demo_dir), demo_dir / "snapshot.json")
+        print(f"  Dashboard snapshot saved. View it: python -m dtds.dashboard")
         if args.check:
             c = summary["company_c"]
             checks = {

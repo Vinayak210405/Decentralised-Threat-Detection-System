@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Threat Consortium Dashboard</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #14181f; --muted: #5b6573; --faint: #8a93a0;
+    --line: #e3e6eb; --accent: #2457d6; --accent-soft: #e8eefc;
+    --crit: #b42318; --crit-bg: #fdecea; --high: #c4520c; --high-bg: #fdf0e6;
+    --med: #946200; --med-bg: #fdf6df; --low: #3c5a80; --low-bg: #eaf0f7; --info: #5b6573; --info-bg: #eef0f3;
+    --good: #18794e; --good-bg: #e6f4ec;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); padding: 14px 28px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+  header .sub { color: var(--muted); font-size: 12.5px; }
+  .grow { flex: 1; }
+  .badge { font-size: 12px; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .badge.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--good); margin-right: 6px; vertical-align: 1px; }
+  .views { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; max-width: 100%; }
+  .views button { flex: 0 0 auto; white-space: nowrap; border: 0; background: var(--panel); padding: 7px 13px; font: inherit; font-size: 13px; color: var(--muted); cursor: pointer; border-right: 1px solid var(--line); }
+  .views button:last-child { border-right: 0; }
+  .views button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  main { max-width: 1240px; margin: 0 auto; padding: 22px 28px 48px; }
+  .lens { border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; border: 1px solid var(--line); background: var(--panel); display: flex; gap: 12px; align-items: flex-start; }
+  .lens strong { display: block; margin-bottom: 2px; }
+  .lens .icon { font-size: 18px; line-height: 1.2; }
+  .lens.company { border-color: #c9d6f7; background: var(--accent-soft); }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .kpi .v { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; }
+  .kpi .l { color: var(--muted); font-size: 12.5px; }
+  .kpi.hl .v { color: var(--crit); }
+  .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; }
+  .scroll { overflow-x: auto; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { header, main { padding-left: 14px; padding-right: 14px; } .views { width: 100%; } }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+  section h2 { font-size: 14px; margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; }
+  section h2 span { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 8px 12px; border-bottom: 1px solid var(--line); background: #fafbfc; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  tr.common td { background: #fffaf9; }
+  .hash { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .plain { font-family: var(--mono); font-size: 12.5px; color: var(--ink); font-weight: 600; white-space: nowrap;
+           overflow: hidden; text-overflow: ellipsis; display: block; max-width: 250px; }
+  .feed .plain { display: inline-block; max-width: 230px; vertical-align: bottom; }
+  .alert .plain { display: inline-block; max-width: 260px; vertical-align: bottom; }
+  td.ind { min-width: 210px; }
+  th:first-child, td:first-child { padding-left: 16px; }
+  td.nw, .bar { white-space: nowrap; }
+  .note { color: var(--faint); font-size: 12px; }
+  .chip { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .s4 { color: var(--crit); background: var(--crit-bg); } .s3 { color: var(--high); background: var(--high-bg); }
+  .s2 { color: var(--med); background: var(--med-bg); } .s1 { color: var(--low); background: var(--low-bg); }
+  .s0 { color: var(--info); background: var(--info-bg); }
+  .common-b { color: var(--crit); background: var(--crit-bg); } .below-b { color: var(--muted); background: var(--info-bg); font-weight: 500; }
+  .you-b { color: var(--accent); background: var(--accent-soft); } .block-b { color: var(--good); background: var(--good-bg); }
+  .bar { display: flex; align-items: center; gap: 8px; }
+  .bar .track { width: 56px; height: 6px; background: var(--info-bg); border-radius: 3px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--accent); }
+  .bar .fill.done { background: var(--crit); }
+  .feed { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow: auto; }
+  .feed li { padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .feed li:last-child { border-bottom: 0; }
+  .feed .meta { color: var(--faint); font-size: 12px; }
+  .feed .what { margin-top: 2px; }
+  .empty { padding: 18px 16px; color: var(--muted); }
+  .alert { padding: 10px 16px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+  .alert:last-child { border-bottom: 0; }
+  .alert .t { font-weight: 600; }
+  footer { color: var(--faint); font-size: 12px; text-align: center; margin-top: 8px; }
+  code { font-family: var(--mono); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Threat Consortium Dashboard</h1>
+    <div class="sub">Decentralised Threat Detection System: anonymous threat sharing between companies</div>
+  </div>
+  <div class="grow"></div>
+  <span id="source" class="badge">loading</span>
+  <nav id="views" class="views" aria-label="Choose whose view to show"></nav>
+</header>
+<main>
+  <div id="lens" class="lens"></div>
+  <div id="kpis" class="kpis"></div>
+  <div class="grid">
+    <div>
+      <section>
+        <h2>Indicators on-chain <span id="ind-sub"></span></h2>
+        <div id="indicators"></div>
+      </section>
+      <section id="alerts-sec" hidden>
+        <h2>Alerts received <span>this company's own alert log</span></h2>
+        <div id="alerts"></div>
+      </section>
+      <section>
+        <h2>Governance <span>anonymous one-company-one-vote</span></h2>
+        <div id="proposals"></div>
+      </section>
+    </div>
+    <div>
+      <section>
+        <h2>Activity <span>newest first</span></h2>
+        <ul id="feed" class="feed"></ul>
+      </section>
+      <section>
+        <h2>Members <span>identity commitments only</span></h2>
+        <div id="members"></div>
+      </section>
+    </div>
+  </div>
+  <footer id="foot"></footer>
+</main>
+<script>
+"use strict";
+// Everything shown comes from threat reports and on-chain data, which attackers
+// can influence: always escape before inserting into the page.
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const short = (h) => esc(h.slice(0, 10) + "…" + h.slice(-6));
+const plain = (v) => `<span class="plain" title="${esc(v)}">${esc(v)}</span>`;
+const sev = (name, level) => `<span class="chip s${Number(level) | 0}">${esc(name)}</span>`;
+let state = window.__STATE__ || null;
+let view = decodeURIComponent((location.hash.match(/view=([^&]+)/) || [])[1] || "public");
+
+function lens(company) {
+  const el = document.getElementById("lens");
+  if (!company) {
+    el.className = "lens";
+    el.innerHTML = `<div class="icon">🌐</div><div><strong>Public view: what anyone reading the blockchain sees</strong>
+      Indicators appear only as keyed hashes; no IP address, domain or company name is on-chain. Reporters are anonymous:
+      each report carries a zero-knowledge proof of membership, and its nullifier cannot be linked to the reporter or to their other reports.</div>`;
+  } else {
+    el.className = "lens company";
+    el.innerHTML = `<div class="icon">🔒</div><div><strong>${esc(company)}'s private view</strong>
+      Plain-text indicators appear only for hashes ${esc(company)} has seen itself, from its own detector or reports.
+      This data lives on ${esc(company)}'s machine and is never shared. Everything else is the same public data as above.</div>`;
+  }
+}
+
+function render() {
+  if (!state) return;
+  const chain = state.chain;
+  const comp = view === "public" ? null : state.companies[view];
+  const src = document.getElementById("source");
+  const t = new Date(state.generated_at * 1000).toLocaleString();
+  src.textContent = state.source === "live" ? `Live · block ${chain ? chain.block : "?"}` : `Snapshot · ${t}`;
+  src.className = "badge" + (state.source === "live" ? " live" : "");
+
+  const nav = document.getElementById("views");
+  const names = Object.keys(state.companies);
+  nav.innerHTML = [["public", "Public chain"], ...names.map((n) => [n, n])]
+    .map(([k, label]) => `<button data-v="${esc(k)}" class="${k === view ? "on" : ""}">${esc(label)}</button>`).join("");
+  if (view !== "public" && !state.companies[view]) view = "public";
+  nav.querySelectorAll("button").forEach((b) => b.onclick = () => {
+    view = b.dataset.v; history.replaceState(null, "", "#view=" + encodeURIComponent(view)); render();
+  });
+
+  lens(comp ? view : null);
+  if (!chain) {
+    document.getElementById("indicators").innerHTML = `<div class="empty">No chain connected and no snapshot. Run <code>python -m dtds.demo</code> first.</div>`;
+    return;
+  }
+  const common = chain.indicators.filter((i) => i.common).length;
+  const k = [[chain.members.length, "Member companies"], [chain.total_reports, "Anonymous reports"],
+             [common, "Common threats", common > 0], [`${chain.threshold}`, "Reports needed to confirm"]];
+  if (comp) {
+    k.push([comp.reported.length, `Reported by ${view}`], [comp.watchlist.length, "On its blocklist"],
+           [comp.alerts.length, "Alerts received"]);
+  }
+  document.getElementById("kpis").innerHTML = k.map(([v, l, hl]) =>
+    `<div class="kpi${hl ? " hl" : ""}"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+
+  document.getElementById("ind-sub").textContent = `${chain.indicators.length} distinct · ${common} confirmed`;
+  const rows = chain.indicators.map((i) => {
+    const known = comp && comp.known[i.ioc_hash];
+    const who = comp ? (known ? `${plain(known)}<div class="hash" title="${esc(i.ioc_hash)}">${short(i.ioc_hash)}</div>`
+                              : `<div class="hash" title="${esc(i.ioc_hash)}">${short(i.ioc_hash)}</div><div class="note">not seen by ${esc(view)}</div>`)
+                     : `<div class="hash" title="${esc(i.ioc_hash)}">${short(i.ioc_hash)}</div>`;
+    const pct = Math.min(100, 100 * i.reports / chain.threshold);
+    const yours = !comp ? "" : `${comp.reported.includes(i.ioc_hash) ? '<span class="chip you-b">You reported</span>' : ""}${
+      comp.watchlist.includes(i.ioc_hash) ? '<span class="chip block-b">Blocked</span>' : ""}`;
+    return `<tr class="${i.common ? "common" : ""}"><td class="ind">${who}</td>
+      <td><div class="bar"><div class="track"><div class="fill${i.common ? " done" : ""}" style="width:${pct}%"></div></div>${esc(i.reports)} / ${esc(chain.threshold)}</div></td>
+      <td>${esc(i.categories.join(", "))}</td><td class="nw">${sev(i.max_severity, i.max_severity_level)}</td>
+      <td><div class="tags">${i.common ? '<span class="chip common-b">Common threat</span>' : '<span class="chip below-b">Below threshold</span>'}${yours}</div></td></tr>`;
+  }).join("");
+  document.getElementById("indicators").innerHTML = chain.indicators.length ? `<div class="scroll"><table><thead><tr>
+      <th>Indicator</th><th>Reports</th><th>Category</th><th>Severity</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>` : `<div class="empty">No reports yet.</div>`;
+
+  const feed = [...chain.reports].reverse().map((r) => {
+    const known = comp && comp.known[r.ioc_hash];
+    const ind = known ? plain(known) : `<span class="hash">${short(r.ioc_hash)}</span>`;
+    const crossed = r.count_after === chain.threshold;
+    return `<li><div class="meta">Block ${esc(r.block)} · nullifier <span class="hash">${short(r.nullifier)}</span></div>
+      <div class="what">Anonymous member reported ${ind} · ${esc(r.category)} ${sev(r.severity, r.severity_level)}
+      ${crossed ? '<span class="chip common-b">Common threat confirmed</span>' : `<span class="note">${esc(r.count_after)} of ${esc(chain.threshold)}</span>`}</div></li>`;
+  }).join("");
+  document.getElementById("feed").innerHTML = feed || `<li class="empty">No activity yet.</li>`;
+
+  const alertsSec = document.getElementById("alerts-sec");
+  alertsSec.hidden = !comp;
+  if (comp) {
+    document.getElementById("alerts").innerHTML = comp.alerts.length ? [...comp.alerts].reverse().map((a) => `
+      <div class="alert"><div>${sev(a.severity_name, a.severity)}</div><div>
+        <div class="t">${esc(a.title)}</div>
+        <div>${a.known_locally ? plain(a.known_locally) : `<span class="hash">${short(a.ioc_hash)}</span>`}
+          · ${esc(a.category_name)} · ${esc(a.reports)} companies · ${esc(a.action)}</div>
+        <div class="note">${esc(new Date(a.timestamp * 1000).toLocaleString())}</div></div></div>`).join("")
+      : `<div class="empty">No alerts.</div>`;
+  }
+
+  document.getElementById("proposals").innerHTML = chain.proposals.length ? `<table><thead><tr><th>#</th><th>Proposal</th><th>Votes</th><th>Result</th></tr></thead><tbody>${
+    chain.proposals.map((p) => `<tr><td>${esc(p.id)}</td><td>${esc(p.kind)}: <span class="hash">${typeof p.value === "string" ? short(p.value) : esc(p.value)}</span></td>
+      <td>${esc(p.yes)} yes · ${esc(p.no)} no of ${esc(p.members_at_creation)}</td>
+      <td>${p.executed ? '<span class="chip block-b">Passed</span>' : '<span class="chip below-b">Open</span>'}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">No proposals.</div>`;
+
+  const own = comp ? comp.commitment : null;
+  document.getElementById("members").innerHTML = `<table><tbody>${chain.members.map((m) =>
+    `<tr><td>#${esc(m.index)}</td><td class="hash" title="${esc(m.commitment)}">${short(m.commitment)}</td><td>${m.commitment === own ? '<span class="chip you-b">' + esc(view) + "</span>" : ""}</td></tr>`).join("")}</tbody></table>`;
+
+  document.getElementById("foot").textContent = chain.address ? `ThreatRegistry ${chain.address}` : "";
+}
+
+async function load() {
+  if (window.__STATE__) { render(); return; }
+  try {
+    const r = await fetch("api/state", {cache: "no-store"});
+    state = await r.json();
+    render();
+  } catch (e) {
+    document.getElementById("source").textContent = "cannot reach server";
+  }
+  if (!state || state.source === "live") setTimeout(load, 5000);
+}
+load();
+</script>
+</body>
+</html>
