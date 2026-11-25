@@ -33,3 +33,4 @@ circuits/build/tmp/
 __MACOSX/
 .vscode/
 .idea/
+reports/zeek-wrccdc/*.local.csv

@@ -1,0 +1,112 @@
+{
+  "connections": 1021950,
+  "sources": 664,
+  "hours": 0.3526549483670129,
+  "conn_state": {
+    "SF": 355909,
+    "S0": 336963,
+    "REJ": 223175,
+    "RSTO": 46839,
+    "OTH": 30240,
+    "RSTR": 25489,
+    "S1": 2366,
+    "SHR": 345
+  },
+  "proxy_counts": {
+    "unclear": 617,
+    "likely benign": 31,
+    "likely scanner": 16
+  },
+  "detectors": {
+    "classifier": {
+      "flows_flagged_share": 0.3496540926659817,
+      "by_proxy": {
+        "likely scanner": {
+          "sources": 16,
+          "reported": 16,
+          "reported_share_rule": 13,
+          "flows_flagged_share": 0.5385866140610306
+        },
+        "likely benign": {
+          "sources": 15,
+          "reported": 4,
+          "reported_share_rule": 0,
+          "flows_flagged_share": 0.01723210856484445
+        },
+        "unclear": {
+          "sources": 617,
+          "reported": 83,
+          "reported_share_rule": 21,
+          "flows_flagged_share": 0.132330563034063
+        }
+      },
+      "categories_of_flagged_flows": {
+        "Probe": 246162,
+        "DoS": 102873,
+        "U2R": 6879,
+        "R2L": 1415
+      }
+    },
+    "hybrid (uncalibrated)": {
+      "flows_flagged_share": 0.9733685601056803,
+      "by_proxy": {
+        "likely scanner": {
+          "sources": 16,
+          "reported": 16,
+          "reported_share_rule": 16,
+          "flows_flagged_share": 0.9979402106969719
+        },
+        "likely benign": {
+          "sources": 15,
+          "reported": 11,
+          "reported_share_rule": 7,
+          "flows_flagged_share": 0.983926513890667
+        },
+        "unclear": {
+          "sources": 617,
+          "reported": 143,
+          "reported_share_rule": 138,
+          "flows_flagged_share": 0.7003979866557415
+        }
+      },
+      "categories_of_flagged_flows": {
+        "Unknown": 406089,
+        "Probe": 345095,
+        "DoS": 242266,
+        "R2L": 1265,
+        "U2R": 19
+      }
+    },
+    "hybrid (calibrated on half the benign sources)": {
+      "flows_flagged_share": 0.6784167522872939,
+      "by_proxy": {
+        "likely scanner": {
+          "sources": 16,
+          "reported": 16,
+          "reported_share_rule": 16,
+          "flows_flagged_share": 0.9998654249878882
+        },
+        "likely benign": {
+          "sources": 15,
+          "reported": 10,
+          "reported_share_rule": 7,
+          "flows_flagged_share": 0.020631161182947125
+        },
+        "unclear": {
+          "sources": 617,
+          "reported": 145,
+          "reported_share_rule": 145,
+          "flows_flagged_share": 0.8093760973896758
+        }
+      },
+      "categories_of_flagged_flows": {
+        "Probe": 341866,
+        "DoS": 226339,
+        "Unknown": 123819,
+        "R2L": 1265,
+        "U2R": 19
+      }
+    }
+  },
+  "calibration_sources": 16
+}

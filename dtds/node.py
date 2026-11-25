@@ -140,10 +140,14 @@ class CompanyNode:
         return ioc_hash(self.key, canonical_ioc) in self.watchlist
 
     def process_traffic(self, flows: pd.DataFrame, src_col: str = "src_ip", min_flows: int = 5,
-                        min_confidence: float = 0.8, use_consortium: bool = True) -> TrafficResult:
+                        min_confidence: float = 0.8, use_consortium: bool = True,
+                        min_share: float = 0.2) -> TrafficResult:
         """Firewall check against consortium intel, then ML classification of
-        whatever got through; sources with enough confident attack flows
-        become findings to share."""
+        whatever got through. A source becomes a finding to share when at least
+        `min_flows` of its connections AND at least `min_share` of them are
+        confidently flagged. The share rule matters for busy machines: on real
+        traffic (reports/zeek-wrccdc) a benign server with 160,000 connections
+        and a 2% false-alarm rate would otherwise be reported."""
         if self.detector is None:
             raise RuntimeError("no detector model loaded")
         src = flows[src_col].astype(str)
@@ -175,7 +179,7 @@ class CompanyNode:
         for ip, g in df.groupby("src"):
             att = g[g["attack"] & (g["conf"] >= min_confidence)]
             per_source[ip] = {"flows": int(len(g)), "attack_flows": int(len(att))}
-            if len(att) < min_flows or is_internal(ip):
+            if len(att) < min_flows or len(att) < min_share * len(g) or is_internal(ip):
                 continue
             label = Counter(att["pred"]).most_common(1)[0][0]
             cat = ML_LABEL_TO_CATEGORY.get(label, Category.UNKNOWN)

@@ -1,5 +1,6 @@
 """CompanyNode logic that doesn't need a blockchain."""
 import joblib
+import pandas as pd
 import numpy as np
 import pytest
 
@@ -70,3 +71,17 @@ def test_ingest_report(node):
 def test_severity_rules():
     assert severity_for(Category.DOS, flows=100, confidence=0.99) == Severity.CRITICAL
     assert severity_for(Category.RECON, flows=3, confidence=0.5) == Severity.INFO
+
+
+def test_share_rule_ignores_busy_sources_with_a_few_false_alarms(node):
+    n, ds = node
+    f = flows(ds)
+    # A busy benign server: all its rows are Normal, but plant 6 attack-looking rows
+    # among 300, i.e. 2% "false alarms", like the WRCCDC scoring servers.
+    normal_rows = f[ds.y_test.to_numpy() == "Normal"].head(294).copy()
+    attack_rows = f[ds.y_test.to_numpy() == "DoS"].head(6).copy()
+    busy = pd.concat([normal_rows, attack_rows]).assign(src_ip="203.0.113.200")
+    r = n.process_traffic(busy, min_share=0.2)
+    assert r.findings == []
+    r0 = n.process_traffic(busy, min_share=0.0)
+    assert [f.ioc for f in r0.findings] == ["ipv4:203.0.113.200"]
