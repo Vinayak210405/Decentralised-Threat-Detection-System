@@ -80,6 +80,37 @@ class CompanyNode:
         self.watchlist: Dict[int, Dict] = {}    # hash -> on-chain common-threat info
         self.reported: Set[int] = set()
         self.synced_to_block: Optional[int] = None
+        self.traffic_log: List[Dict] = []       # per-batch detection counts (for the dashboard)
+        self._load_state()
+
+    # ------------------------------------------------------------------ #
+    # Local state (never leaves the company's machine)
+    # ------------------------------------------------------------------ #
+    @property
+    def state_path(self) -> Path:
+        return self.dir / "state.json"
+
+    def _load_state(self) -> None:
+        if not self.state_path.exists():
+            return
+        d = json.loads(self.state_path.read_text(encoding="utf-8"))
+        self.local_index = {int(h, 16): v for h, v in d.get("known", {}).items()}
+        self.reported = {int(h, 16) for h in d.get("reported", [])}
+        self.watchlist = {int(h, 16): v for h, v in d.get("watchlist", {}).items()}
+        self.synced_to_block = d.get("synced_to_block")
+        self.traffic_log = d.get("traffic", [])
+
+    def save_state(self) -> None:
+        """Persist what this company knows locally: which plaintext indicator each
+        hash stands for, what it reported, its watchlist. This is private: it is
+        exactly what the chain does NOT contain."""
+        d = {"company": self.name,
+             "known": {hex(h): v for h, v in self.local_index.items()},
+             "reported": [hex(h) for h in sorted(self.reported)],
+             "watchlist": {hex(h): v for h, v in self.watchlist.items()},
+             "synced_to_block": self.synced_to_block,
+             "traffic": self.traffic_log[-200:]}
+        self.state_path.write_text(json.dumps(d, indent=1), encoding="utf-8")
 
     # ------------------------------------------------------------------ #
     # Identity
@@ -155,6 +186,10 @@ class CompanyNode:
                                      "predicted": label, "mean_confidence": round(c, 3)}))
         for ip in src[blocked].unique():
             per_source.setdefault(ip, {"flows": 0, "attack_flows": 0})["blocked"] = int((src[blocked] == ip).sum())
+        self.traffic_log.append({"time": time.time(), "flows": int(len(flows)), "blocked": int(blocked.sum()),
+                                 "flagged": int(is_attack.sum()), "findings": len(findings),
+                                 "consortium": bool(use_consortium)})
+        self.save_state()
         return TrafficResult(len(flows), int(blocked.sum()), int(is_attack.sum()), findings, per_source)
 
     def ingest_report(self, path) -> List[Finding]:
@@ -194,6 +229,7 @@ class CompanyNode:
             self.reported.add(h)
             out.append({"ioc": f.ioc, "ioc_hash": h, "evidence": cid, "gas": receipt.gasUsed,
                         "prove_seconds": round(prove_s, 2), "tx": receipt.transactionHash.hex()})
+        self.save_state()
         return out
 
     def sync(self) -> List[Alert]:
@@ -220,6 +256,7 @@ class CompanyNode:
             self.alerter.send(alert)
             alerts.append(alert)
         self.synced_to_block = head
+        self.save_state()
         return alerts
 
     # ------------------------------------------------------------------ #
