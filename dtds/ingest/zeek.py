@@ -50,6 +50,9 @@ CONTENT_FEATURES = ["wrong_fragment", "urgent", "hot", "num_failed_logins", "log
                     "num_file_creations", "num_shells", "num_access_files", "is_host_login",
                     "is_guest_login"]
 
+NEEDED_COLUMNS = {"ts", "id.orig_h", "id.orig_p", "id.resp_h", "id.resp_p", "proto", "duration",
+                  "orig_bytes", "resp_bytes", "conn_state"}
+
 TIME_WINDOW_SECONDS = 2.0
 HOST_WINDOW_CONNECTIONS = 255
 
@@ -84,20 +87,22 @@ def read_conn_log(path: Union[str, Path]) -> pd.DataFrame:
     if first.lstrip().startswith("{"):
         rows = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
         return pd.DataFrame(rows)
-    fields = None
-    rows = []
+    fields, header_lines = None, 0
     with open(path, encoding="utf-8") as f:
         for line in f:
-            line = line.rstrip("\n")
+            if not line.startswith("#"):
+                break
+            header_lines += 1
             if line.startswith("#fields"):
-                fields = line.split("\t")[1:]
-            elif line.startswith("#") or not line:
-                continue
-            else:
-                rows.append(line.split("\t"))
+                fields = line.rstrip("\n").split("\t")[1:]
     if fields is None:
         raise ValueError(f"{path}: no '#fields' header; is this a Zeek conn.log?")
-    return pd.DataFrame(rows, columns=fields)
+    # Only the columns the features need, parsed by pandas' C reader: a million-
+    # connection log then fits comfortably in memory.
+    use = [c for c in fields if c in NEEDED_COLUMNS]
+    df = pd.read_csv(path, sep="\t", skiprows=header_lines, names=fields, usecols=use, dtype=str,
+                     na_filter=False, quoting=3, engine="c")
+    return df[~df["ts"].str.startswith("#")].reset_index(drop=True)   # drop the trailing "#close" line
 
 
 def _num(series: pd.Series) -> pd.Series:
