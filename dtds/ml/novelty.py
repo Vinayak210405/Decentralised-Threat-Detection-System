@@ -168,6 +168,30 @@ class HybridDetector:
         self.threshold_ = float(np.quantile(combined_val, 1 - self.target_far))
         return self
 
+    def calibrate_to_baseline(self, X_normal: pd.DataFrame, target_far: Optional[float] = None,
+                              refit_anomaly: bool = True) -> "HybridDetector":
+        """Adapt to ONE company's network using a period of its own clean traffic.
+
+        A detector trained on someone else's "normal" (here: a 1999 network)
+        over-alarms on today's traffic. Half of the baseline refits the anomaly
+        detector (what normal looks like HERE); the other half re-standardises
+        both scores and resets the alarm threshold to `target_far` of this
+        network's normal flows. The classifier itself is not retrained.
+        """
+        if target_far is not None:
+            self.target_far = target_far
+        fit_part = X_normal.sample(frac=0.5, random_state=self.seed)
+        cal_part = X_normal.drop(fit_part.index)
+        if refit_anomaly:
+            self.anomaly = AnomalyScorer(self.anomaly_kind, self.categorical, self.numeric,
+                                         self.seed).fit(fit_part)
+        p, a = self.attack_probability(cal_part), self.anomaly.score(cal_part)
+        self.clf_scale = NormalScale(logit).fit(p)
+        self.anom_scale = NormalScale(log_score).fit(a)
+        self.threshold_ = float(np.quantile(self._combine(p, a), 1 - self.target_far))
+        self.baseline_rows_ = len(X_normal)
+        return self
+
     def attack_probability(self, X) -> np.ndarray:
         return 1.0 - self.clf.predict_proba(X)[:, self.normal_idx]
 
