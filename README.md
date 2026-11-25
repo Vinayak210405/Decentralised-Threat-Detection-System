@@ -38,6 +38,33 @@ All numbers below were measured by the code in this repo; the commands to reprod
 
 The NSL-KDD test set is deliberately hard: 16.6% of its rows are 17 attack types that never appear in training. The best single model catches **84.5% of attack types it was trained on but only 37% of novel ones**. That gap is the case for sharing between companies. Per-class tables and confusion matrices: [`reports/ml/nsl-kdd/results.md`](reports/ml/nsl-kdd/results.md).
 
+### Intrusion detection (UNSW-NB15, official partitioned sets)
+
+| Model | Accuracy | Macro-F1 | Detection rate | False alarms |
+|---|---|---|---|---|
+| Logistic regression | 62.1% | 35.8% | 99.3% | 42.3% |
+| **Random forest** | **74.9%** | 48.3% | 97.0% | **23.2%** |
+| Gradient boosting | 67.8% | **50.5%** | 99.6% | 40.2% |
+| MLP (128-64) | 75.0% | 44.2% | 98.0% | 27.9% |
+
+UNSW-NB15 is modern (2015) traffic with 9 attack families. Its official test set is known for normal traffic that differs from the training set, so every model over-alarms on normal flows; as attack-vs-normal, the random forest scores 87.9% accuracy, in line with published results on this split. The release names its two files the wrong way round; [`dtds/ml/datasets.py`](dtds/ml/datasets.py) follows the paper (train on the 175,341-row file) and verifies checksums. [`reports/ml/unsw-nb15/results.md`](reports/ml/unsw-nb15/results.md).
+
+### Catching attacks the model has never seen (`dtds/ml/novelty.py`)
+
+A hybrid detector adds an **autoencoder trained only on normal traffic** to the classifier: whatever doesn't look normal raises its score, attack labels or not. Detectors are compared **at the same false-alarm rate**, because any detector catches more when allowed more false alarms.
+
+| Novel-attack detection | at 2% false alarms | at 5% | at 10% |
+|---|---|---|---|
+| NSL-KDD, 17 unseen attack types: classifier alone | 5.3% | 71.0% | 75.5% |
+| NSL-KDD: **hybrid** | 7.7% | **80.3%** | **82.9%** |
+| UNSW-NB15, mean of 9 held-out families: classifier alone | 62.9% | **73.4%** | **82.6%** |
+| UNSW-NB15: **hybrid** | **66.4%** | 70.5% | 77.7% |
+
+The honest summary: **the hybrid helps when a new attack looks unlike normal traffic and hurts when it imitates normal traffic.** On UNSW-NB15, held-out Generic attacks go from 2% to 99% detected and Exploits from 71% to 86%, but Reconnaissance drops from 75% to 25% and Shellcode from 27% to 1%. So it ships as an option, not the default. Two more findings came out of this:
+
+* Most of the classifier's "37% on novel attacks" is its default threshold, not the model: allowed 5% false alarms instead of 2.8%, the same classifier catches 71%.
+* Choices were made after looking at test results (the combination rule, then the autoencoder over an isolation forest, which was worse on UNSW-NB15), so every variant tried is published: [`novelty_autoencoder.md`](reports/ml/nsl-kdd/novelty_autoencoder.md), [`novelty_iforest.md`](reports/ml/nsl-kdd/novelty_iforest.md) for NSL-KDD and [the same two](reports/ml/unsw-nb15/) for UNSW-NB15.
+
 ### Federated learning across 3 simulated companies (mean ± std over 5 seeds)
 
 Each company sees normal traffic plus **only its own attack types** (A: DoS + probing, B: remote-access attacks, C: privilege escalation), the realistic case:
@@ -50,7 +77,7 @@ Each company sees normal traffic plus **only its own attack types** (A: DoS + pr
 
 Federated training gets within about 1 point of the pooled-data model without any company sharing a single flow. Standard sample-weighted FedAvg reaches 49.7%: the largest company drowns out rare attacks only smaller companies have seen, which equal per-company weighting fixes. Full table (including Dirichlet and IID splits): [`reports/ml/nsl-kdd/federated_summary.md`](reports/ml/nsl-kdd/federated_summary.md).
 
-### End-to-end demo (`python -m dtds.demo`, 22 s)
+### End-to-end demo (`python -m dtds.demo`, about 40 s)
 
 A real local chain, real Groth16 proofs, the trained detector, and the team's sample threat reports:
 
@@ -60,7 +87,8 @@ A real local chain, real Groth16 proofs, the trained detector, and the team's sa
 
 | Company C | Attack flows stopped | Legitimate flows blocked |
 |---|---|---|
-| Its own ML model alone | 28 / 150 (19%) | n/a |
+| Its own ML classifier alone | 28 / 150 (19%) | n/a |
+| Its own hybrid detector (classifier + autoencoder) | 128 / 150 (85%) | 19 / 400 (4.8%) false alarms |
 | **With consortium early warning** | **150 / 150 (100%)** | **0** |
 
 * Privacy check: no plaintext indicator is on-chain, an outsider's guess without the consortium key doesn't match, all 13 reports come from one relayer address, and company B cannot decrypt company A's evidence.
@@ -96,6 +124,7 @@ flowchart LR
 | Component | Where | What it does |
 |---|---|---|
 | ML detection | [`dtds/ml/`](dtds/ml) | Dataset loaders (NSL-KDD, UNSW-NB15, CIC-IDS2017), signed-log + scaling + one-hot preprocessing, 4 classifiers, per-class and novel-attack evaluation |
+| Novel-attack detection | [`dtds/ml/novelty.py`](dtds/ml/novelty.py) | Hybrid classifier + anomaly detector (autoencoder, isolation forest or kNN) trained on normal traffic, evaluated at matched false-alarm rates and leave-one-family-out |
 | Federated learning | [`dtds/ml/federated.py`](dtds/ml/federated.py) | FedAvg from scratch, federated feature scaling from aggregated statistics, non-IID partitions, class-balanced local loss |
 | Report ingestion | [`dtds/extraction/`](dtds/extraction) | Text from PDF, DOCX, HTML, STIX/JSON, email, XLSX; refanging (`hxxp`, `[.]`), private/documentation IP filtering, benign allowlist, canonical IOC form |
 | Keyed IOC hashing | [`dtds/sharing/ioc_hash.py`](dtds/sharing/ioc_hash.py) | HMAC-SHA256 under a consortium key, sized to the SNARK field |
@@ -125,7 +154,7 @@ This is a research prototype. It is honest about where its guarantees stop:
 * **Single-party trusted setup.** The Groth16 phase-2 setup in `circuits/build/` was run by one machine. That's fine for a demo, but a real consortium must run a multi-party ceremony so no single party could forge proofs.
 * **Relayer.** Anonymity on-chain requires submitting through a relayer (or fresh addresses). The demo uses one shared dev account to model this.
 * **Federated learning shares weights.** Model updates can leak information about training data (gradient inversion). Secure aggregation or differential privacy would be the next step; neither is implemented.
-* **Datasets.** NSL-KDD is old (derived from 1999 traffic) but has an official split with novel attacks, which this project needs. Loaders for the modern UNSW-NB15 and CIC-IDS2017 are included; download them to run the same experiments.
+* **Datasets.** NSL-KDD is old (derived from 1999 traffic) but has an official split with novel attacks. UNSW-NB15 (2015) is the modern check; the federated-learning experiments have not been repeated on it yet.
 * **Threshold choice.** A higher threshold resists colluding members but warns later. It is a governance parameter (changeable by vote).
 
 ## Reproduce
@@ -139,7 +168,7 @@ npm install
 pip install -r requirements.txt
 
 npx hardhat test                 # 17 contract + ZK tests
-python -m pytest -q              # 34 Python tests
+python -m pytest -q              # 41 Python tests
 python -m dtds.demo              # end-to-end demo (starts its own local chain)
 ```
 
@@ -149,10 +178,13 @@ Experiments (NSL-KDD downloads automatically, about 20 MB):
 python -m dtds.ml.train --dataset nsl-kdd                                   # 4 models, ~1.5 min
 python -m dtds.ml.federated --partition by-attack --aggregation uniform     # ~1.5 min
 python scripts/fl_multiseed.py --seeds 1 2 3 4 5                            # ~25 min
+python -m dtds.ml.train --dataset unsw-nb15                                 # downloads ~47 MB, checksum-verified
+python -m dtds.ml.novelty --dataset nsl-kdd                                 # hybrid detector, ~4 min
+python -m dtds.ml.novelty --dataset unsw-nb15                               # leave-one-family-out, ~25 min
 python -m dtds.extraction samples/reports/cisa_aa22-320a_iranian_apt.pdf    # IOC extraction
 ```
 
-Other datasets: put the CSVs in `data/raw/unsw-nb15/` or `data/raw/cic-ids2017/` (links in [`dtds/ml/datasets.py`](dtds/ml/datasets.py)) and pass `--dataset unsw-nb15` or `--dataset cic-ids2017`.
+CIC-IDS2017 (about 1 GB) is not downloaded automatically: put its CSVs in `data/raw/cic-ids2017/` (link in [`dtds/ml/datasets.py`](dtds/ml/datasets.py)) and pass `--dataset cic-ids2017`. Its loader has not been run against the real files yet.
 
 Rebuild the circuit and verifier (needs `circom` 2.1.x on PATH): `npm run zk:build`.
 

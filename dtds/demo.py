@@ -112,6 +112,15 @@ def deploy(members, threshold, demo_dir: Path) -> Path:
     return ROOT / "deployments" / "localhost.json"
 
 
+def ensure_hybrid(ds) -> Path:
+    path = MODELS_DIR / "nsl-kdd_hybrid.joblib"
+    if not path.exists():
+        print("Training the hybrid detector (classifier + autoencoder anomaly detector, ~30 s) ...")
+        from dtds.ml.novelty import save_hybrid
+        save_hybrid(ds)
+    return path
+
+
 def ensure_model() -> Path:
     path = MODELS_DIR / "nsl-kdd_hgb.joblib"
     if not path.exists():
@@ -214,14 +223,27 @@ def main(argv=None):
         attack_rows = (traffic_c["src_ip"] == ATTACKER).sum()
         alone = nodes["C"].process_traffic(traffic_c, use_consortium=False)
         caught_alone = alone.per_source.get(ATTACKER, {}).get("attack_flows", 0)
+        # The same company with the hybrid detector (classifier + anomaly detector).
+        import joblib
+        classifier_only = nodes["C"].detector
+        nodes["C"].detector = joblib.load(ensure_hybrid(ds))
+        hyb = nodes["C"].process_traffic(traffic_c, use_consortium=False)
+        nodes["C"].detector = classifier_only
+        caught_hybrid = hyb.per_source.get(ATTACKER, {}).get("attack_flows", 0)
+        legit_rows = traffic_c["src_ip"] != ATTACKER
+        hybrid_false_alarms = sum(v["attack_flows"] for ip, v in hyb.per_source.items() if ip != ATTACKER)
         with_c = nodes["C"].process_traffic(traffic_c, use_consortium=True)
         normal_blocked = int(((traffic_c["src_ip"] != ATTACKER) &
                               traffic_c["src_ip"].map(lambda ip: nodes["C"].is_blocked(f"ipv4:{ip}"))).sum())
         print(f"  Attack flows from {ATTACKER}: {attack_rows}")
         print(f"  C's own model alone flags:      {caught_alone} ({caught_alone / attack_rows:.0%})")
+        print(f"  C's hybrid detector alone flags: {caught_hybrid} ({caught_hybrid / attack_rows:.0%}), "
+              f"false alarms on {hybrid_false_alarms} of {int(legit_rows.sum())} legitimate flows")
         print(f"  C with consortium early warning: {with_c.blocked_by_consortium} blocked before reaching "
               f"the model ({with_c.blocked_by_consortium / attack_rows:.0%}); legitimate flows blocked: {normal_blocked}")
         summary["company_c"] = {"attack_flows": int(attack_rows), "model_alone_flagged": int(caught_alone),
+                                "hybrid_alone_flagged": int(caught_hybrid),
+                                "hybrid_false_alarms": int(hybrid_false_alarms),
                                 "blocked_with_consortium": with_c.blocked_by_consortium,
                                 "legitimate_blocked": normal_blocked}
 
@@ -275,6 +297,7 @@ def main(argv=None):
                 "every attack flow at C blocked": c["blocked_with_consortium"] == c["attack_flows"],
                 "no legitimate flow blocked": c["legitimate_blocked"] == 0,
                 "C's model alone misses most of the novel variant": c["model_alone_flagged"] < c["attack_flows"] / 2,
+                "hybrid detector catches more of it than the classifier": c["hybrid_alone_flagged"] > c["model_alone_flagged"],
                 "Company D admitted": summary["members"] == 4,
             }
             for name, ok in checks.items():

@@ -3,9 +3,9 @@ Starting a local Hardhat chain ...
 ==============================================================================
 1. Consortium setup
 ==============================================================================
-  Company A: identity commitment 0x11749652eea6b79e05... (secret stays on its own machine)
-  Company B: identity commitment 0x5e640c4824a192fb48... (secret stays on its own machine)
-  Company C: identity commitment 0x288211e512a494c4f7... (secret stays on its own machine)
+  Company A: identity commitment 0xb79155a063bf62167a... (secret stays on its own machine)
+  Company B: identity commitment 0x2876768cb8bca65583... (secret stays on its own machine)
+  Company C: identity commitment 0x12e712d604bbc4a74b... (secret stays on its own machine)
   ThreatRegistry deployed at 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 with 3 founding members -> deployments/localhost.json
   Threshold: an indicator becomes a common threat after 2 independent reports
 
@@ -14,30 +14,30 @@ Starting a local Hardhat chain ...
 ==============================================================================
   520 flows, 128 classified as attacks
   finding: ipv4:203.0.113.66 DOS severity CRITICAL {'attack_flows': 116, 'flows': 120, 'predicted': 'DoS', 'mean_confidence': 0.994}
-  A reported ipv4:203.0.113.66                                              proof 1.1s, gas 327,422
+  A reported ipv4:203.0.113.66                                              proof 1.4s, gas 327,410
 
 ==============================================================================
 3. Company B is hit by the same attacker, plus a port scan only B sees
 ==============================================================================
   finding: ipv4:198.51.100.23 RECON severity MEDIUM {'attack_flows': 59, 'flows': 60, 'predicted': 'Probe', 'mean_confidence': 0.979}
   finding: ipv4:203.0.113.66 DOS severity CRITICAL {'attack_flows': 79, 'flows': 80, 'predicted': 'DoS', 'mean_confidence': 0.994}
-  B reported ipv4:198.51.100.23                                             proof 1.2s, gas 310,298
-  B reported ipv4:203.0.113.66                                              proof 1.1s, gas 338,994
+  B reported ipv4:198.51.100.23                                             proof 1.2s, gas 310,310
+  B reported ipv4:203.0.113.66                                              proof 1.3s, gas 339,030
 
 ==============================================================================
 4. A and B each ingest a different threat-intel report
 ==============================================================================
   A extracted 6 indicators from threat_report.docx, B extracted 4 from similar.docx
-  A reported domain:www.evilcorp.biz                                        proof 1.2s, gas 310,298
-  A reported ipv4:182.54.217.2                                              proof 1.1s, gas 310,298
-  A reported md5:44d88612fea8a8f36de82e1278abb02f                           proof 1.2s, gas 310,310
-  A reported sha1:2fd4e1c67a2d28fced849ee1bb76e7391b93eb12                  proof 1.2s, gas 310,310
-  A reported sha256:9c56cc51b374f3d4e4517a1e15b0431d5071d81b492a13475e8a2c46542e5de9 proof 1.2s, gas 310,298
-  A reported url:https://malicious-domain.com/payload.exe                   proof 1.2s, gas 310,310
-  B reported ipv4:182.54.217.2                                              proof 1.2s, gas 321,894
-  B reported sha1:2fd4e1c67a2d28fced849ee1bb76e7391b93eb12                  proof 1.2s, gas 321,918
+  A reported domain:www.evilcorp.biz                                        proof 1.4s, gas 310,322
+  A reported ipv4:182.54.217.2                                              proof 1.2s, gas 310,298
+  A reported md5:44d88612fea8a8f36de82e1278abb02f                           proof 1.3s, gas 310,298
+  A reported sha1:2fd4e1c67a2d28fced849ee1bb76e7391b93eb12                  proof 1.4s, gas 310,298
+  A reported sha256:9c56cc51b374f3d4e4517a1e15b0431d5071d81b492a13475e8a2c46542e5de9 proof 1.5s, gas 310,322
+  A reported url:https://malicious-domain.com/payload.exe                   proof 1.3s, gas 310,298
+  B reported ipv4:182.54.217.2                                              proof 1.3s, gas 321,930
+  B reported sha1:2fd4e1c67a2d28fced849ee1bb76e7391b93eb12                  proof 1.3s, gas 321,918
   B reported sha256:a5d3b84a28d44edb77b8aef21de7c9b7ee273ef1f5e62de92e82342e155ec6d3 proof 1.2s, gas 310,298
-  B reported url:https://malicious-domain.com/phishing                      proof 1.1s, gas 310,286
+  B reported url:https://malicious-domain.com/phishing                      proof 1.4s, gas 310,298
 
 ==============================================================================
 5. Everyone syncs with the chain
@@ -51,23 +51,25 @@ Starting a local Hardhat chain ...
   ALERT [Company B] MEDIUM Common threat confirmed (we have seen it too): ipv4:182.54.217.2 reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
   ALERT [Company B] MEDIUM Common threat confirmed (we have seen it too): sha1:2fd4e1c67a2d28fced849ee1bb76e7391b93eb12 reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
 -- Company C
-  ALERT [Company C] CRITICAL Early warning: common threat not yet seen here: indicator hash 0x469aa46a03856a38... reported by 2 member companies (category DOS); action: added to blocklist
-  ALERT [Company C] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x20f4f6fd880fcbdc... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
-  ALERT [Company C] MEDIUM Early warning: common threat not yet seen here: indicator hash 0xa53ff7381206fe3e... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
+  ALERT [Company C] CRITICAL Early warning: common threat not yet seen here: indicator hash 0x873fb450eea040d9... reported by 2 member companies (category DOS); action: added to blocklist
+  ALERT [Company C] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x4e8ee9815bdc806c... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
+  ALERT [Company C] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x3428952d9001db49... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
   Common threats on-chain: 3; total reports: 13
   Scanner 198.51.100.23: 1 report(s), below threshold, so no alert (one company's sighting is not yet trusted)
 
 ==============================================================================
 6. The attacker moves to Company C with a DoS variant the model was never trained on
 ==============================================================================
+Training the hybrid detector (classifier + autoencoder anomaly detector, ~30 s) ...
   Attack flows from 203.0.113.66: 150
   C's own model alone flags:      28 (19%)
+  C's hybrid detector alone flags: 128 (85%), false alarms on 19 of 400 legitimate flows
   C with consortium early warning: 150 blocked before reaching the model (100%); legitimate flows blocked: 0
 
 ==============================================================================
 7. Privacy check: what does an outsider reading the chain see?
 ==============================================================================
-  A report on-chain: iocHash=0x469aa46a03856a38b49d... category=1 severity=4 evidence=local:sha256:f45064caf3dfcab18... nullifier=0x5f92a023e1ac3ba3...
+  A report on-chain: iocHash=0x873fb450eea040d9a856... category=1 severity=4 evidence=local:sha256:3f0f44d80e92f6ef1... nullifier=0x1db0daa2bde1c023...
   Outsider guesses '203.0.113.66' without the consortium key -> hash found on-chain? False
   Distinct transaction senders across 13 reports: 1 (the relayer)
   Nullifiers differ for every (company, indicator) pair, so reports cannot be grouped by company.
@@ -78,9 +80,9 @@ Starting a local Hardhat chain ...
 ==============================================================================
   Proposal 0: yes=2 no=0 of 3 members
   Executed. Members now: 4. D is a member: True
-  ALERT [Company D] CRITICAL Early warning: common threat not yet seen here: indicator hash 0x469aa46a03856a38... reported by 2 member companies (category DOS); action: added to blocklist
-  ALERT [Company D] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x20f4f6fd880fcbdc... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
-  ALERT [Company D] MEDIUM Early warning: common threat not yet seen here: indicator hash 0xa53ff7381206fe3e... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
+  ALERT [Company D] CRITICAL Early warning: common threat not yet seen here: indicator hash 0x873fb450eea040d9... reported by 2 member companies (category DOS); action: added to blocklist
+  ALERT [Company D] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x4e8ee9815bdc806c... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
+  ALERT [Company D] MEDIUM Early warning: common threat not yet seen here: indicator hash 0x3428952d9001db49... reported by 2 member companies (category INTEL_REPORT); action: added to blocklist
   D's watchlist after first sync: 3 common threats
   [PASS] 3 common threats (shared attacker + 2 report overlaps)
   [PASS] scanner seen by one company stays below threshold
@@ -88,8 +90,9 @@ Starting a local Hardhat chain ...
   [PASS] every attack flow at C blocked
   [PASS] no legitimate flow blocked
   [PASS] C's model alone misses most of the novel variant
+  [PASS] hybrid detector catches more of it than the classifier
   [PASS] Company D admitted
 
 ==============================================================================
-Done in 22.5s. Summary: .nodes/demo/summary.json
+Done in 40.1s. Summary: .nodes/demo/summary.json
 ==============================================================================
