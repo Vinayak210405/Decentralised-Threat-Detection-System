@@ -14,9 +14,10 @@ Supported datasets
                     the official "training-set" and "testing-set" CSVs from
                     https://research.unsw.edu.au/projects/unsw-nb15-dataset in
                     ``data/raw/unsw-nb15/``.
-* ``cic-ids2017`` - download "MachineLearningCSV.zip" from
-                    https://www.unb.ca/cic/datasets/ids-2017.html and extract
-                    the CSVs into ``data/raw/cic-ids2017/``.
+* ``cic-ids2017`` - downloaded automatically (~880 MB, checksum-verified), or
+                    put the official MachineLearningCVE CSVs from
+                    https://www.unb.ca/cic/datasets/ids-2017.html in
+                    ``data/raw/cic-ids2017/``.
 """
 from __future__ import annotations
 
@@ -280,38 +281,109 @@ def _cic_category(label: str) -> str:
 _CIC_ID_COLUMNS = ["Flow ID", "Source IP", "Src IP", "Destination IP", "Dst IP",
                    "Source Port", "Src Port", "Timestamp"]
 
+# SHA-256 of the 8 MachineLearningCVE CSVs the committed results were produced
+# with. Their label counts match the published totals exactly (2,830,743 rows).
+CIC_IDS2017_SHA256 = {
+    "Monday-WorkingHours.pcap_ISCX.csv": "852c4beb34eda186f32561fa79df7a0747e92e1a6535b01270820dd9ffe17f34",
+    "Tuesday-WorkingHours.pcap_ISCX.csv": "52b8692ae8c7d2ed04671fe2b98335693c0a92c7ab157d8c8b534d6523080851",
+    "Wednesday-workingHours.pcap_ISCX.csv": "893c27dc968bf7a8adef1689f90be55ca4a4dc3088fb63d6ff247ac56856df2a",
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv": "d67066211fb1689c78406f1506f4c44704ecb92088353d5c96d96d6474eb819d",
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv": "6bcda3857c2504676034e3ea57762d38393cc734cb377a726bd5cb153961b1b5",
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv": "53a41c24d570ea83b7ac55b2e94df94e7a8216aeb80a2af0246b6bc8bb543000",
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv": "ca1824c51bfbb7b3c72290a11be04366ba8815878c6a1cc5c44cb1cee269e99b",
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv": "6ff1580f5f81c0ae28a26f7631721018577f5f7c5e0feac28b795fcfe7b411ee",
+}
+# The official site needs a form; scripts use a GitHub mirror and accept files
+# ONLY if their SHA-256 matches the hashes above.
+CIC_IDS2017_MIRROR = ("https://media.githubusercontent.com/media/2000pawan/"
+                      "Cyber-Attack-Threat-Classification/HEAD/MachineLearningCVE/{name}")
+
+
+def download_cic_ids2017(dest: Optional[Path] = None) -> Path:
+    dest = ensure(dest or RAW_DIR / "cic-ids2017")
+    for name, digest in CIC_IDS2017_SHA256.items():
+        target = dest / name
+        if not target.exists():
+            print(f"Downloading {name} (mirror, checksum-verified) ...")
+            urllib.request.urlretrieve(CIC_IDS2017_MIRROR.format(name=name), target)
+        if _sha256(target) != digest:
+            target.unlink()
+            raise ValueError(f"{name} failed its SHA-256 check and was deleted. Download the official "
+                             "files from https://www.unb.ca/cic/datasets/ids-2017.html instead.")
+    return dest
+
+
+def _sample_keep_rare(X: pd.DataFrame, y: pd.Series, max_rows: int, keep_below: int, seed: int):
+    """Stratified sample to about max_rows, but classes smaller than keep_below are
+    kept whole (a plain stratified sample would leave ~2 Heartbleed rows)."""
+    counts = y.value_counts()
+    rare = counts[counts < keep_below].index
+    n_rare = int(counts[rare].sum())
+    frac = min(1.0, (max_rows - n_rare) / max(1, len(y) - n_rare))
+    rng = np.random.default_rng(seed)
+    keep = y.isin(rare).to_numpy() | (rng.random(len(y)) < frac)
+    return X[keep], y[keep]
+
 
 def load_cic_ids2017(root: Optional[Path] = None, max_rows: Optional[int] = 600_000,
-                     seed: int = 42) -> Dataset:
+                     seed: int = 42, download: bool = True) -> Dataset:
+    """CIC-IDS2017 "MachineLearningCVE" flows (CICFlowMeter features, 5 days).
+
+    Cleaning, each step reported in the notes: identifier columns and the
+    duplicated "Fwd Header Length" column are dropped, rows with NaN/inf are
+    dropped, and EXACT DUPLICATE rows are removed before splitting. Duplicates
+    are a known flaw of this dataset; left in, the same flow lands in both
+    train and test and inflates scores. There is no official split, so a
+    stratified 80/20 split is used (comparable with the literature, and known
+    to be optimistic); the leave-one-family-out test in dtds.ml.novelty is the
+    harder one.
+    """
     root = Path(root or RAW_DIR / "cic-ids2017")
     csvs = sorted(root.glob("*.csv"))
+    if not csvs and download:
+        download_cic_ids2017(root)
+        csvs = sorted(root.glob("*.csv"))
     if not csvs:
         raise FileNotFoundError(
             f"No CSVs in {root}. Download MachineLearningCSV.zip from "
             "https://www.unb.ca/cic/datasets/ids-2017.html and extract it there.")
     parts = []
     for path in csvs:
-        df = pd.read_csv(path, encoding="latin-1", low_memory=False)
+        head = pd.read_csv(path, nrows=0, encoding="latin-1")
+        dtypes = {c: np.float32 for c in head.columns if c.strip() != "Label"}
+        df = pd.read_csv(path, encoding="latin-1", dtype=dtypes)
         df.columns = [c.strip() for c in df.columns]
         parts.append(df)
     df = pd.concat(parts, ignore_index=True)
-    df = df.drop(columns=[c for c in _CIC_ID_COLUMNS if c in df.columns])
-    # The dataset's en-dash in "Web Attack – XSS" is often mangled by encodings.
+    n_raw = len(df)
+    dup_cols = [c for c in df.columns if c.endswith(".1")]   # pandas' name for the repeated column
+    df = df.drop(columns=[c for c in _CIC_ID_COLUMNS + dup_cols if c in df.columns])
+    # The dataset's en-dash in "Web Attack – XSS" is mangled by its own encoding.
     df["Label"] = df["Label"].astype(str).str.replace(r"[^\x20-\x7e]+", "-", regex=True).str.strip()
-    y = df.pop("Label").map(_cic_category).rename("label")
-    X = df.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
-    keep = X.notna().all(axis=1)
-    X, y = X[keep], y[keep]
+    num = df.columns.drop("Label")
+    df[num] = df[num].replace([np.inf, -np.inf], np.nan)
+    bad = df[num].isna().any(axis=1)
+    df = df[~bad]
+    n_before = len(df)
+    df = df.drop_duplicates()
+    n_dupes = n_before - len(df)
+    detail = df.pop("Label")
+    y = detail.map(_cic_category).rename("label")
+    X = df
     constant = [c for c in X.columns if X[c].nunique() <= 1]
     X = X.drop(columns=constant)
-    notes = [f"{len(csvs)} CSV files, {int((~keep).sum())} rows with NaN/inf dropped, "
-             f"{len(constant)} constant columns dropped",
-             "no official split: stratified 80/20 split"]
+    notes = [f"{len(csvs)} CSV files, {n_raw:,} rows; {int(bad.sum()):,} rows with NaN/inf dropped, "
+             f"{n_dupes:,} exact duplicate rows removed, {len(constant)} constant and "
+             f"{len(dup_cols)} duplicated columns dropped",
+             "no official split: stratified 80/20 split after de-duplication"]
     if max_rows and len(X) > max_rows:
-        X, _, y, _ = train_test_split(X, y, train_size=max_rows, stratify=y, random_state=seed)
-        notes.append(f"stratified sample of {max_rows} rows (pass max_rows=None for all)")
+        X, y = _sample_keep_rare(X, y, max_rows, 5000, seed)
+        notes.append(f"sample of {len(X):,} rows: classes under 5,000 rows kept whole, the rest sampled "
+                     "uniformly (pass max_rows=None for all)")
+    detail = detail.loc[X.index].rename("attack")
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, stratify=y, random_state=seed)
-    return Dataset("cic-ids2017", X_tr, y_tr, X_te, y_te, [], list(X.columns), notes)
+    return Dataset("cic-ids2017", X_tr, y_tr, X_te, y_te, [], list(X.columns), notes,
+                   y_test_detail=detail.loc[X_te.index])
 
 
 LOADERS: Dict[str, Callable[..., Dataset]] = {

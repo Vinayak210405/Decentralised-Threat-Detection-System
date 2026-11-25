@@ -1,0 +1,550 @@
+{
+  "dataset": {
+    "dataset": "cic-ids2017",
+    "train_rows": 479779,
+    "test_rows": 119945,
+    "features": 69,
+    "categorical_features": [],
+    "train_class_counts": {
+      "Normal": 395876,
+      "DoS": 61386,
+      "Probe": 17425,
+      "BruteForce": 1791,
+      "WebAttack": 1714,
+      "Botnet": 1558,
+      "Infiltration": 29
+    },
+    "test_class_counts": {
+      "Normal": 98969,
+      "DoS": 15346,
+      "Probe": 4356,
+      "BruteForce": 448,
+      "WebAttack": 429,
+      "Botnet": 390,
+      "Infiltration": 7
+    },
+    "notes": [
+      "8 CSV files, 2,830,743 rows; 2,867 rows with NaN/inf dropped, 329,896 exact duplicate rows removed, 8 constant and 1 duplicated columns dropped",
+      "no official split: stratified 80/20 split after de-duplication",
+      "sample of 599,724 rows: classes under 5,000 rows kept whole, the rest sampled uniformly (pass max_rows=None for all)"
+    ]
+  },
+  "models": {
+    "logreg": {
+      "accuracy": 0.948151235983159,
+      "macro_f1": 0.6572757999196291,
+      "weighted_f1": 0.9652512733147834,
+      "detection_rate": 0.9987128146453089,
+      "false_alarm_rate": 0.06180723256777375,
+      "per_class": {
+        "Normal": {
+          "precision": 0.9997092991957278,
+          "recall": 0.9381927674322262,
+          "f1": 0.9679746465952213,
+          "support": 98969
+        },
+        "Botnet": {
+          "precision": 0.10168155543878087,
+          "recall": 0.9923076923076923,
+          "f1": 0.18446139180171592,
+          "support": 390
+        },
+        "BruteForce": {
+          "precision": 0.835820895522388,
+          "recall": 1.0,
+          "f1": 0.9105691056910569,
+          "support": 448
+        },
+        "DoS": {
+          "precision": 0.9607127117043379,
+          "recall": 0.9943307702332855,
+          "f1": 0.9772327003746518,
+          "support": 15346
+        },
+        "Infiltration": {
+          "precision": 0.004858299595141701,
+          "recall": 0.8571428571428571,
+          "f1": 0.00966183574879227,
+          "support": 7
+        },
+        "Probe": {
+          "precision": 0.956837700946928,
+          "recall": 0.9974747474747475,
+          "f1": 0.9767337304709452,
+          "support": 4356
+        },
+        "WebAttack": {
+          "precision": 0.4028169014084507,
+          "recall": 1.0,
+          "f1": 0.5742971887550201,
+          "support": 429
+        }
+      },
+      "confusion_matrix": [
+        [
+          92852,
+          3416,
+          88,
+          618,
+          1223,
+          188,
+          584
+        ],
+        [
+          3,
+          387,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          448,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          0,
+          15259,
+          6,
+          8,
+          49
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          6,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          6,
+          0,
+          4345,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          429
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "Botnet",
+        "BruteForce",
+        "DoS",
+        "Infiltration",
+        "Probe",
+        "WebAttack"
+      ],
+      "description": "Logistic regression, class-balanced (linear baseline)",
+      "train_seconds": 39.937342645,
+      "inference_ms_per_1k": 1.2061811496936423,
+      "confusion_png": "confusion_logreg.png"
+    },
+    "rf": {
+      "accuracy": 0.9980824544582934,
+      "macro_f1": 0.957997443644948,
+      "weighted_f1": 0.9980730696797933,
+      "detection_rate": 0.9938024408848207,
+      "false_alarm_rate": 0.0009497923592235953,
+      "per_class": {
+        "Normal": {
+          "precision": 0.9986869350032826,
+          "recall": 0.9990502076407765,
+          "f1": 0.9988685382929071,
+          "support": 98969
+        },
+        "Botnet": {
+          "precision": 0.921832884097035,
+          "recall": 0.8769230769230769,
+          "f1": 0.8988173455978975,
+          "support": 390
+        },
+        "BruteForce": {
+          "precision": 1.0,
+          "recall": 0.9955357142857143,
+          "f1": 0.9977628635346756,
+          "support": 448
+        },
+        "DoS": {
+          "precision": 0.9986304943263337,
+          "recall": 0.9978496025022807,
+          "f1": 0.9982398956975228,
+          "support": 15346
+        },
+        "Infiltration": {
+          "precision": 1.0,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333334,
+          "support": 7
+        },
+        "Probe": {
+          "precision": 0.989664676159853,
+          "recall": 0.9892102846648301,
+          "f1": 0.9894374282433984,
+          "support": 4356
+        },
+        "WebAttack": {
+          "precision": 0.9883720930232558,
+          "recall": 0.9906759906759907,
+          "f1": 0.989522700814901,
+          "support": 429
+        }
+      },
+      "confusion_matrix": [
+        [
+          98875,
+          29,
+          0,
+          19,
+          0,
+          45,
+          1
+        ],
+        [
+          48,
+          342,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          446,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          32,
+          0,
+          0,
+          15313,
+          0,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ],
+        [
+          42,
+          0,
+          0,
+          2,
+          0,
+          4309,
+          3
+        ],
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          425
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "Botnet",
+        "BruteForce",
+        "DoS",
+        "Infiltration",
+        "Probe",
+        "WebAttack"
+      ],
+      "description": "Random forest, 200 trees, balanced class weights per bootstrap",
+      "train_seconds": 233.32843677599996,
+      "inference_ms_per_1k": 19.991038834465673,
+      "confusion_png": "confusion_rf.png"
+    },
+    "hgb": {
+      "accuracy": 0.9983158947851098,
+      "macro_f1": 0.9595126812943168,
+      "weighted_f1": 0.9983224746017693,
+      "detection_rate": 0.9979977116704806,
+      "false_alarm_rate": 0.0015257302791783286,
+      "per_class": {
+        "Normal": {
+          "precision": 0.9995751567873761,
+          "recall": 0.9984742697208216,
+          "f1": 0.9990244099702268,
+          "support": 98969
+        },
+        "Botnet": {
+          "precision": 0.8869778869778869,
+          "recall": 0.9256410256410257,
+          "f1": 0.9058971141781681,
+          "support": 390
+        },
+        "BruteForce": {
+          "precision": 0.9955555555555555,
+          "recall": 1.0,
+          "f1": 0.9977728285077951,
+          "support": 448
+        },
+        "DoS": {
+          "precision": 0.9964271794205535,
+          "recall": 0.9995438550762413,
+          "f1": 0.9979830839297332,
+          "support": 15346
+        },
+        "Infiltration": {
+          "precision": 1.0,
+          "recall": 0.7142857142857143,
+          "f1": 0.8333333333333334,
+          "support": 7
+        },
+        "Probe": {
+          "precision": 0.9884011826245167,
+          "recall": 0.9977043158861341,
+          "f1": 0.9930309608134354,
+          "support": 4356
+        },
+        "WebAttack": {
+          "precision": 0.9861111111111112,
+          "recall": 0.993006993006993,
+          "f1": 0.9895470383275261,
+          "support": 429
+        }
+      },
+      "confusion_matrix": [
+        [
+          98818,
+          46,
+          2,
+          54,
+          0,
+          48,
+          1
+        ],
+        [
+          29,
+          361,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          448,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          15339,
+          0,
+          3,
+          2
+        ],
+        [
+          2,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0,
+          1,
+          0,
+          4346,
+          3
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          426
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "Botnet",
+        "BruteForce",
+        "DoS",
+        "Infiltration",
+        "Probe",
+        "WebAttack"
+      ],
+      "description": "Histogram gradient boosting, balanced class weights",
+      "train_seconds": 42.09607078100004,
+      "inference_ms_per_1k": 24.342574304889524,
+      "confusion_png": "confusion_hgb.png"
+    },
+    "mlp": {
+      "accuracy": 0.9978573512860061,
+      "macro_f1": 0.9283445636102466,
+      "weighted_f1": 0.9978588826092533,
+      "detection_rate": 0.9952326468344775,
+      "false_alarm_rate": 0.0014954177570754479,
+      "per_class": {
+        "Normal": {
+          "precision": 0.9989890923059815,
+          "recall": 0.9985045822429246,
+          "f1": 0.9987467785133155,
+          "support": 98969
+        },
+        "Botnet": {
+          "precision": 0.8535353535353535,
+          "recall": 0.8666666666666667,
+          "f1": 0.8600508905852418,
+          "support": 390
+        },
+        "BruteForce": {
+          "precision": 0.9954853273137697,
+          "recall": 0.984375,
+          "f1": 0.98989898989899,
+          "support": 448
+        },
+        "DoS": {
+          "precision": 0.9972634870992964,
+          "recall": 0.997393457578522,
+          "f1": 0.9973284681045156,
+          "support": 15346
+        },
+        "Infiltration": {
+          "precision": 0.8,
+          "recall": 0.5714285714285714,
+          "f1": 0.6666666666666666,
+          "support": 7
+        },
+        "Probe": {
+          "precision": 0.9890859481582538,
+          "recall": 0.9986225895316805,
+          "f1": 0.9938313913639479,
+          "support": 4356
+        },
+        "WebAttack": {
+          "precision": 0.9861751152073732,
+          "recall": 0.9976689976689976,
+          "f1": 0.9918887601390498,
+          "support": 429
+        }
+      },
+      "confusion_matrix": [
+        [
+          98821,
+          58,
+          2,
+          38,
+          1,
+          48,
+          1
+        ],
+        [
+          52,
+          338,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          441,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          38,
+          0,
+          0,
+          15306,
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          3,
+          0,
+          4350,
+          3
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          428
+        ]
+      ],
+      "labels": [
+        "Normal",
+        "Botnet",
+        "BruteForce",
+        "DoS",
+        "Infiltration",
+        "Probe",
+        "WebAttack"
+      ],
+      "description": "Multi-layer perceptron (128-64), Adam, early stopping",
+      "train_seconds": 127.97833131699997,
+      "inference_ms_per_1k": 7.3307854266541765,
+      "confusion_png": "confusion_mlp.png"
+    }
+  }
+}
